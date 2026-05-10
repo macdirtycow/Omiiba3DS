@@ -1,5 +1,5 @@
 /*
- *   This file is part of Luma3DS
+ *   This file is part of Omiiba3DS
  *   Copyright (C) 2016-2021 Aurora Wright, TuxSH
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -1895,7 +1895,7 @@ static void Cheat_LoadCheatsIntoMemory(u64 titleId)
     cheatTitleInfo = titleId;
 
     char path[64] = { 0 };
-    sprintf(path, "/luma/titles/%016llX/cheats.txt", titleId);
+    sprintf(path, "/omiiba/titles/%016llX/cheats.txt", titleId);
 
     BufferedFile file;
 

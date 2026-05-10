@@ -38,7 +38,7 @@ enum singleOptions
 
 extern u32 config, multiConfig, bootConfig;
 
-void readLumaConfig(void);
+void readOmiibaConfig(void);
 bool hasKExt(void);
 u32 getKExtSize(void);
 u32 getStolenSystemMemRegionSize(void);

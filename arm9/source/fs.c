@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2021 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,8 @@ static FATFS sdFs,
 
 static bool switchToMainDir(bool isSd)
 {
-    const char *mainDir = isSd ? "/luma" : "/rw/luma";
+    const char *mainDir = isSd ? "/omiiba" : "/rw/omiiba";
+    const char *legacyDir = isSd ? "/luma" : "/rw/luma";
 
     switch(f_chdir(mainDir))
     {
@@ -53,9 +54,13 @@ static bool switchToMainDir(bool isSd)
             return true;
         case FR_NO_PATH:
         {
+            /* Migrate legacy Luma3DS/Omiiba3DS folder layout if present */
+            if (f_rename(legacyDir, mainDir) == FR_OK && f_chdir(mainDir) == FR_OK)
+                return true;
+
             if (f_mkdir(mainDir) != FR_OK)
             {
-                error("Failed to create luma directory.");
+                error("Failed to create /omiiba directory.");
                 return false;
             }
             return switchToMainDir(isSd);
@@ -309,7 +314,7 @@ bool payloadMenu(char *path, bool *hasDisplayedMenu)
         initScreens();
         *hasDisplayedMenu = true;
 
-        drawString(true, 10, 10, COLOR_TITLE, "Luma3DS chainloader");
+        drawString(true, 10, 10, COLOR_TITLE, "Omiiba3DS chainloader");
         drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "Press A to select, START to quit");
 
         for(u32 i = 0, posY = 10 + 3 * SPACING_Y, color = COLOR_RED; i < payloadNum; i++, posY += SPACING_Y)
@@ -502,7 +507,7 @@ static bool backupEssentialFiles(void)
     return ok;
 }
 
-bool doLumaUpgradeProcess(void)
+bool doOmiibaUpgradeProcess(void)
 {
     bool ok = true, ok2 = true;
 
@@ -519,11 +524,11 @@ bool doLumaUpgradeProcess(void)
     ok2 = backupEssentialFiles();
 
     // Clean up some of the old files
-    fileDelete("sdmc:/luma/config.bin");
-    fileDelete("nand:/rw/luma/config.bin");
+    fileDelete("sdmc:/omiiba/config.bin");
+    fileDelete("nand:/rw/omiiba/config.bin");
 
-    createDir("sdmc:/luma/payloads");
-    createDir("nand:/rw/luma/payloads");
+    createDir("sdmc:/omiiba/payloads");
+    createDir("nand:/rw/omiiba/payloads");
 
     return ok && ok2;
 }

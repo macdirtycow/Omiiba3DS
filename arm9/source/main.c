@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2023 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -214,6 +214,12 @@ void main(int argc, char **argv, u32 magicWord)
 
     //Get pressed buttons
     u32 pressed = HID_PAD;
+
+    // Show the Omiiba3DS coldboot splash, but only on a true cold boot
+    // (not firmlaunch / NTR / payload chain) and only if the user is not
+    // currently mashing buttons (e.g. holding SELECT for the boot menu).
+    if (bootType != FIRMLAUNCH && bootType != NTR && pressed == 0)
+        omiibaBootSplash();
 
     //If it's a MCU reboot, try to force boot options
     if(CFG_BOOTENV && needConfig != CREATE_CONFIGURATION)

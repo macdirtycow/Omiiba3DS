@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2022 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@
 #include "ifile.h"
 #include "menus.h"
 #include "utils.h"
-#include "luma_config.h"
+#include "omiiba_config.h"
 #include "menus/n3ds.h"
 #include "menus/cheats.h"
 #include "minisoc.h"
@@ -389,7 +389,7 @@ void menuThreadMain(void)
         }
 
         if (saveSettingsRequest) {
-            LumaConfig_SaveSettings();
+            OmiibaConfig_SaveSettings();
             saveSettingsRequest = false;
         }
     }
@@ -505,9 +505,9 @@ static void menuDraw(Menu *menu, u32 selected)
         Draw_DrawFormattedString(SCREEN_BOT_WIDTH - 10 - SPACING_X * 19, SCREEN_BOT_HEIGHT - 20, COLOR_WHITE, "%19s", "");
 
     if(isRelease)
-        Draw_DrawFormattedString(10, SCREEN_BOT_HEIGHT - 20, COLOR_TITLE, "Luma3DS %s", versionString);
+        Draw_DrawFormattedString(10, SCREEN_BOT_HEIGHT - 20, COLOR_TITLE, "Omiiba3DS %s", versionString);
     else
-        Draw_DrawFormattedString(10, SCREEN_BOT_HEIGHT - 20, COLOR_TITLE, "Luma3DS %s-%08lx", versionString, commitHash);
+        Draw_DrawFormattedString(10, SCREEN_BOT_HEIGHT - 20, COLOR_TITLE, "Omiiba3DS %s-%08lx", versionString, commitHash);
 
     Draw_FlushFramebuffer();
 }

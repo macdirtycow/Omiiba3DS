@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2021 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -276,9 +276,9 @@ u32 loadNintendoFirm(FirmwareType *firmType, FirmwareSource nandType, bool loadF
     if(!ISN3DS && *firmType == NATIVE_FIRM && firm->section[0].address == (u8 *)0x1FF80000)
     {
         //We can't boot < 3.x EmuNANDs
-        if(nandType != FIRMWARE_SYSNAND) error("An old unsupported EmuNAND has been detected.\nLuma3DS is unable to boot it.");
+        if(nandType != FIRMWARE_SYSNAND) error("An old unsupported EmuNAND has been detected.\nOmiiba3DS is unable to boot it.");
 
-        //If you want to use SAFE_FIRM on 1.0, use Luma from NAND & comment this line:
+        //If you want to use SAFE_FIRM on 1.0, use Omiiba3DS from NAND & comment this line:
         if(isSafeMode) error("SAFE_MODE is not supported on 1.x/2.x FIRM.");
 
         *firmType = NATIVE_FIRM1X2X;
@@ -300,10 +300,10 @@ void loadHomebrewFirm(u32 pressed)
 
     if(payloadSize <= 0x200 || !checkFirm(payloadSize)) error("The payload is invalid or corrupted.");
 
-    char absPath[24 + 255];
+    char absPath[32 + 255];
 
-    if(isSdMode) sprintf(absPath, "sdmc:/luma/%s", path);
-    else sprintf(absPath, "nand:/rw/luma/%s", path);
+    if(isSdMode) sprintf(absPath, "sdmc:/omiiba/%s", path);
+    else sprintf(absPath, "nand:/rw/omiiba/%s", path);
 
     char *argv[2] = {absPath, (char *)fbs};
     bool wantsScreenInit = (firm->reserved2[0] & 1) != 0;
@@ -759,7 +759,7 @@ u32 patch1x2xNativeAndSafeFirm(void)
     ret += patchSvcBreak9(arm9Section, kernel9Size, (u32)firm->section[2].address);
 
     //Apply firmlaunch patches
-    //Doesn't work here if Luma is on SD. If you want to use SAFE_FIRM on 1.0, use Luma from NAND & uncomment this line:
+    //Doesn't work here if Omiiba3DS is on SD. If you want to use SAFE_FIRM on 1.0, use Omiiba3DS from NAND & uncomment this line:
     //ret += patchFirmlaunches(process9Offset, process9Size, process9MemAddr);
 
     if(ISN3DS && CONFIG(ENABLESAFEFIRMROSALINA))
@@ -847,12 +847,12 @@ u32 patchPrototypeNative(FirmwareSource nandType, bool doUnitinfoPatch)
             
             if (memcmp(hash, boot9Sha256, 32) != 0)
             {
-                u32 size = getFileSize("sdmc:/luma/backups/boot9.bin");
-                int readres = fileRead(b9, "sdmc:/luma/backups/boot9.bin", 0x10000);
+                u32 size = getFileSize("sdmc:/omiiba/backups/boot9.bin");
+                int readres = fileRead(b9, "sdmc:/omiiba/backups/boot9.bin", 0x10000);
                 sha(hash, b9, 0x10000, SHA_256_MODE);
                 
                 if (size != 0x10000 || !readres || memcmp(hash, boot9Sha256, 32) != 0)
-                    error("No valid boot9 backup was found in memory or in\nsdmc:/luma/backups/boot9.bin. Please make sure\nyou have a valid backup to use this FIRM.");
+                    error("No valid boot9 backup was found in memory or in\nsdmc:/omiiba/backups/boot9.bin. Please make sure\nyou have a valid backup to use this FIRM.");
             }
             else
             {

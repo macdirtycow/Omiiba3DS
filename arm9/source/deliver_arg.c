@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2022 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -214,12 +214,12 @@ static bool configureHomebrewAutobootTwl(u8 *deliverArg)
     // has been set to its current value by NATIVE_FIRM) and N3DS (because "pwn_cnt" and "inertia" are missing
     // their N3DS-only bits)
     // - "rave party" when booting into TWL/AGB_FIRM or O3DS NATIVE_FIRM without these regs (well, the LUT) initialized.
-    // Easiest way to do so is by leveraging the "DSi autooboot" feature Luma provides. It is worth noting at least
+    // Easiest way to do so is by leveraging the "DSi autooboot" feature Omiiba3DS provides. It is worth noting at least
     // the LUT survives hardware reboots (if Nintendo were using DSi software that was using TLNC-based reboots,
     // they wouldn't have noticed).
 
     // As such, zerofill these registers (from testing, hardware explicitly discards null values, so this
-    // should be fine). For now, only touch the Luma-initiated autoboot path
+    // should be fine). For now, only touch the Omiiba3DS-initiated autoboot path
 
     if (ISN3DS)
         zerofillN3dsAblRegisters();

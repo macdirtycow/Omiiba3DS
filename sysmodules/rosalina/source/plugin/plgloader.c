@@ -1,7 +1,7 @@
 #include <3ds.h>
 #include "ifile.h"
 #include "utils.h" // for makeARMBranch
-#include "luma_config.h"
+#include "omiiba_config.h"
 #include "plugin.h"
 #include "fmt.h"
 #include "menu.h"
@@ -44,7 +44,7 @@ void        PluginLoader__Init(void)
     svcKernelSetState(0x10007, ctx->kernelEvent, 0, 0);
 
     IFile file;
-    if (R_SUCCEEDED(IFile_Open(&file, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/luma/plugins/user_param.bin"), FS_OPEN_READ)))
+    if (R_SUCCEEDED(IFile_Open(&file, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/omiiba/plugins/user_param.bin"), FS_OPEN_READ)))
     {
         PluginLoadParameters *params = &ctx->userLoadParameters;
         u64 temp_read;
@@ -75,7 +75,7 @@ bool        PluginLoader__IsEnabled(void)
 void        PluginLoader__MenuCallback(void)
 {
     PluginLoaderCtx.isEnabled = !PluginLoaderCtx.isEnabled;
-    LumaConfig_RequestSaveSettings();
+    OmiibaConfig_RequestSaveSettings();
     PluginLoader__UpdateMenu();
 }
 
@@ -207,7 +207,7 @@ void     PluginLoader__HandleCommands(void *_ctx)
             if (cmdbuf[1] != ctx->isEnabled)
             {
                 ctx->isEnabled = cmdbuf[1];
-                LumaConfig_RequestSaveSettings();
+                OmiibaConfig_RequestSaveSettings();
                 PluginLoader__UpdateMenu();
             }
 
@@ -238,7 +238,7 @@ void     PluginLoader__HandleCommands(void *_ctx)
             if (params->persistent)
             {
                 IFile file;
-                if (R_SUCCEEDED(IFile_Open(&file, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/luma/plugins/user_param.bin"),
+                if (R_SUCCEEDED(IFile_Open(&file, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/omiiba/plugins/user_param.bin"),
                                            FS_OPEN_CREATE | FS_OPEN_READ | FS_OPEN_WRITE))) {
                     u64 tempWritten;
                     u32 magic = PERS_USER_FILE_MAGIC;
@@ -456,7 +456,7 @@ void     PluginLoader__HandleCommands(void *_ctx)
             FS_Archive sd;
             if(R_SUCCEEDED(FSUSER_OpenArchive(&sd, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""))))
             {
-                FSUSER_DeleteFile(sd, fsMakePath(PATH_ASCII, "/luma/plugins/user_param.bin"));
+                FSUSER_DeleteFile(sd, fsMakePath(PATH_ASCII, "/omiiba/plugins/user_param.bin"));
                 FSUSER_CloseArchive(sd);
             }
 

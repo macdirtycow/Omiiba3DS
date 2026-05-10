@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2020 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 #include "buttons.h"
 #include "arm9_exception_handlers.h"
 
-// See https://github.com/LumaTeam/luma3ds_exception_dump_parser
+// See https://github.com/LumaTeam/luma3ds_exception_dump_parser (same crash dump format)
 
 void installArm9Handlers(void)
 {
@@ -190,7 +190,7 @@ void detectAndProcessExceptionDumps(void)
     if(fileWrite((void *)dumpHeader, path, dumpHeader->totalSize))
     {
         posY = drawString(true, 10, posY + SPACING_Y, COLOR_WHITE, "You can find the dump in the following file:");
-        posY = drawFormattedString(true, 10, posY + SPACING_Y, COLOR_WHITE, "%s:/luma/%s", isSdMode ? "SD" : "CTRNAND", path) + SPACING_Y;
+        posY = drawFormattedString(true, 10, posY + SPACING_Y, COLOR_WHITE, "%s:/omiiba/%s", isSdMode ? "SD" : "CTRNAND", path) + SPACING_Y;
     }
     else posY = drawString(true, 10, posY + SPACING_Y, COLOR_RED, "Error writing the dump file");
 

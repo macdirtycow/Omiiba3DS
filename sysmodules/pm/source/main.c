@@ -13,7 +13,7 @@
 #include "util.h"
 #include "my_thread.h"
 #include "service_manager.h"
-#include "luma.h"
+#include "omiiba.h"
 
 static MyThread processMonitorThread, taskRunnerThread;
 static u8 CTR_ALIGN(8) processDataBuffer[0x40 * sizeof(ProcessData)] = {0};
@@ -35,7 +35,7 @@ Result __sync_init(void);
 void initSystem()
 {
     __sync_init();
-    readLumaConfig();
+    readOmiibaConfig();
     //__libc_init_array();
 
     // Wait for sm

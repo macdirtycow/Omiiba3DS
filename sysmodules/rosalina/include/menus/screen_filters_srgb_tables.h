@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// (c) 2024 LumaTeam
+// (c) 2024 OmiibaTeam
 
 #pragma once
 #include <3ds/types.h>

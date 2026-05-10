@@ -6,7 +6,7 @@
 #include "reslimit.h"
 #include "manager.h"
 #include "util.h"
-#include "luma_shared_config.h"
+#include "omiiba_shared_config.h"
 
 static void cleanupProcess(ProcessData *process)
 {
@@ -38,7 +38,7 @@ static void cleanupProcess(ProcessData *process)
         // We need to do this here to ensure that the ExHeader at init matches the ExHeader
         // at termination at all times, otherwise the process refcounts of sysmodules
         // get all messed up.
-        Luma_SharedConfig->hbldr_3dsx_tid = Luma_SharedConfig->selected_hbldr_3dsx_tid;
+        Omiiba_SharedConfig->hbldr_3dsx_tid = Omiiba_SharedConfig->selected_hbldr_3dsx_tid;
     }
 
     if (g_manager.debugData != NULL && process->handle == g_manager.debugData->handle) {

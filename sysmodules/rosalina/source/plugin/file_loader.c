@@ -11,8 +11,8 @@
 static FS_DirectoryEntry   g_entries[10];
 
 static char        g_path[256];
-static const char *g_dirPath = "/luma/plugins/%016llX";
-static const char *g_defaultPath = "/luma/plugins/default.3gx";
+static const char *g_dirPath = "/omiiba/plugins/%016llX";
+static const char *g_defaultPath = "/omiiba/plugins/default.3gx";
 
 // pluginLoader.s
 void        gamePatchFunc(void);
@@ -195,7 +195,7 @@ bool     TryToLoadPlugin(Handle process, bool isHomebrew)
             "Couldn't read file.",
             "Invalid plugin file\nNot a valid 3GX plugin format!",
             "Outdated plugin file\nCheck for an updated plugin.",
-            "Outdated plugin loader\nCheck for Luma3DS updates."   
+            "Outdated plugin loader\nCheck for Omiiba3DS updates."   
         };
 
         ctx->error.message = errors[R_MODULE(res) == RM_LDR ? R_DESCRIPTION(res) : 0];

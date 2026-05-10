@@ -2,7 +2,7 @@
 #include "reslimit.h"
 #include "util.h"
 #include "manager.h"
-#include "luma.h"
+#include "omiiba.h"
 
 #define CPUTIME_MULTI_MASK      BIT(7)
 #define CPUTIME_SINGLE_MASK     0

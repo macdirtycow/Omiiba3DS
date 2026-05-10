@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2021 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -106,7 +106,7 @@ void initSystem(void)
     if (R_FAILED(FSUSER_SetPriority(-16)))
         svcBreak(USERBREAK_PANIC);
 
-    miscellaneousMenu.items[0].title = Luma_SharedConfig->selected_hbldr_3dsx_tid == HBLDR_DEFAULT_3DSX_TID ?
+    miscellaneousMenu.items[0].title = Omiiba_SharedConfig->selected_hbldr_3dsx_tid == HBLDR_DEFAULT_3DSX_TID ?
         "Switch the hb. title to the current app." :
         "Switch the hb. title to " HBLDR_DEFAULT_3DSX_TITLE_NAME;
 

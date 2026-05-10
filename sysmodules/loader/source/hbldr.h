@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2022 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 #pragma once
 
 #include <3ds.h>
-#include "luma_shared_config.h"
+#include "omiiba_shared_config.h"
 
 Result hbldrLoadProcess(Handle *outProcessHandle, const ExHeader_Info *exhi);
 void hbldrPatchExHeaderInfo(ExHeader_Info *exhi);
@@ -35,9 +35,9 @@ void hbldrHandleCommands(void *ctx);
 
 static inline bool hbldrIs3dsxTitle(u64 tid)
 {
-    if (!Luma_SharedConfig->use_hbldr)
+    if (!Omiiba_SharedConfig->use_hbldr)
         return false;
-    u64 hbldrTid = Luma_SharedConfig->hbldr_3dsx_tid;
+    u64 hbldrTid = Omiiba_SharedConfig->hbldr_3dsx_tid;
 
     // Just like p9 clears them, ignore platform/N3DS bits
     return ((tid ^ hbldrTid) & ~0xF0000000ull) == 0;

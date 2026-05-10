@@ -24,7 +24,7 @@ ProcessData *findProcessData(u32 pid)
 
 ProcessData *doRegisterProcess(u32 pid, char (*serviceAccessList)[8], u32 serviceAccessListSize)
 {
-    (void)serviceAccessList; // Service access list checks removed for Luma3DS, see original 3ds_sm for implementation details.
+    (void)serviceAccessList; // Service access list checks removed for Omiiba3DS, see original 3ds_sm for implementation details.
     (void)serviceAccessListSize;
 
     ProcessData *processData = (ProcessData *)allocateNode(&processDataInUseList, &freeProcessDataList, sizeof(ProcessData), false);

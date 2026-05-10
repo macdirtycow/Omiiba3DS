@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2023 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@
 #include "shell.h"
 #include "utils.h"
 #include "screen_filters.h"
-#include "luma_config.h"
+#include "omiiba_config.h"
 
 static void forceAudioOutput(u32 forceOp)
 {

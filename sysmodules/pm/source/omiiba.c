@@ -1,15 +1,15 @@
 #include <3ds.h>
 #include <string.h>
-#include "luma.h"
+#include "omiiba.h"
 #include "util.h"
 
 u32 config, multiConfig, bootConfig;
 
-void readLumaConfig(void)
+void readOmiibaConfig(void)
 {
     s64 out = 0;
-    bool isLumaWithKext = svcGetSystemInfo(&out, 0x20000, 0) == 1;
-    if (isLumaWithKext)
+    bool isOmiibaWithKext = svcGetSystemInfo(&out, 0x20000, 0) == 1;
+    if (isOmiibaWithKext)
     {
         svcGetSystemInfo(&out, 0x10000, 3);
         config = (u32)out;

@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2021 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -45,4 +45,4 @@ bool payloadMenu(char *path, bool *hasDisplayedMenu);
 u32 firmRead(void *dest, u32 firmType);
 void findDumpFile(const char *folderPath, char *fileName);
 
-bool doLumaUpgradeProcess(void);
+bool doOmiibaUpgradeProcess(void);

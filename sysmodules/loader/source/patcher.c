@@ -51,14 +51,14 @@ static bool dirCheck(FS_ArchiveID archiveId, const char *path)
     return ret;
 }
 
-static bool openLumaFile(IFile *file, const char *path)
+static bool openOmiibaFile(IFile *file, const char *path)
 {
     FS_ArchiveID archiveId = isSdMode ? ARCHIVE_SDMC : ARCHIVE_NAND_RW;
 
     return R_SUCCEEDED(fileOpen(file, archiveId, path, FS_OPEN_READ));
 }
 
-static u32 checkLumaDir(const char *path)
+static u32 checkOmiibaDir(const char *path)
 {
     FS_ArchiveID archiveId = isSdMode ? ARCHIVE_SDMC : ARCHIVE_NAND_RW;
 
@@ -83,15 +83,15 @@ static inline bool secureInfoExists(void)
 
 static inline void loadCustomVerString(u16 *out, u32 *verStringSize, u32 currentNand)
 {
-    static const char *paths[] = { "/luma/customversion_sys.txt",
-                                   "/luma/customversion_emu.txt",
-                                   "/luma/customversion_emu2.txt",
-                                   "/luma/customversion_emu3.txt",
-                                   "/luma/customversion_emu4.txt" };
+    static const char *paths[] = { "/omiiba/customversion_sys.txt",
+                                   "/omiiba/customversion_emu.txt",
+                                   "/omiiba/customversion_emu2.txt",
+                                   "/omiiba/customversion_emu3.txt",
+                                   "/omiiba/customversion_emu4.txt" };
 
     IFile file;
 
-    if(!openLumaFile(&file, paths[currentNand])) return;
+    if(!openOmiibaFile(&file, paths[currentNand])) return;
 
     u64 fileSize;
 
@@ -268,7 +268,7 @@ static inline bool findLayeredFsPayloadOffset(u8 *code, u32 size, u32 roSize, u3
 
 static inline bool applyCodeIpsPatch(u64 progId, u8 *code, u32 size)
 {
-    /* Here we look for "/luma/titles/[u64 titleID in hex, uppercase]/code.ips"
+    /* Here we look for "/omiiba/titles/[u64 titleID in hex, uppercase]/code.ips"
        If it exists it should be an IPS format patch */
 
     bool isSysmodule = (progId >> 32) == 0x00040130;
@@ -276,16 +276,16 @@ static inline bool applyCodeIpsPatch(u64 progId, u8 *code, u32 size)
 
     if (isSysmodule)
     {
-        char path[] = "/luma/sysmodules/0000000000000000.ips";
+        char path[] = "/omiiba/sysmodules/0000000000000000.ips";
         progId &= ~0xF0000000ull; // clear N3DS bit
         progIdToStr(path + 32, progId);
-        if(!openLumaFile(&file, path)) return true;
+        if(!openOmiibaFile(&file, path)) return true;
     }
     else
     {
-        char path[] = "/luma/titles/0000000000000000/code.ips";
+        char path[] = "/omiiba/titles/0000000000000000/code.ips";
         progIdToStr(path + 28, progId);
-        if(!openLumaFile(&file, path)) return true;
+        if(!openOmiibaFile(&file, path)) return true;
     }
 
     bool ret = false;
@@ -338,8 +338,8 @@ exit:
 Result openSysmoduleCxi(IFile *outFile, u64 progId)
 {
     progId &= ~0xF0000000ull; // clear N3DS bit
-    char path[] = "/luma/sysmodules/0000000000000000.cxi";
-    progIdToStr(path + sizeof("/luma/sysmodules/0000000000000000") - 2, progId);
+    char path[] = "/omiiba/sysmodules/0000000000000000.cxi";
+    progIdToStr(path + sizeof("/omiiba/sysmodules/0000000000000000") - 2, progId);
 
     FS_ArchiveID archiveId = isSdMode ? ARCHIVE_SDMC : ARCHIVE_NAND_RW;
     return fileOpen(outFile, archiveId, path, FS_OPEN_READ);
@@ -401,15 +401,15 @@ bool readSysmoduleCxiCode(u8 *outCode, u32 *outSize, u32 maxSize, IFile *file, c
 
 bool loadTitleCodeSection(u64 progId, u8 *code, u32 size)
 {
-    /* Here we look for "/luma/titles/[u64 titleID in hex, uppercase]/code.bin"
+    /* Here we look for "/omiiba/titles/[u64 titleID in hex, uppercase]/code.bin"
        If it exists it should be a decrypted and decompressed binary code file */
 
-    char path[] = "/luma/titles/0000000000000000/code.bin";
+    char path[] = "/omiiba/titles/0000000000000000/code.bin";
     progIdToStr(path + 28, progId);
 
     IFile file;
 
-    if(!openLumaFile(&file, path)) return false;
+    if(!openOmiibaFile(&file, path)) return false;
 
     u64 fileSize;
 
@@ -434,15 +434,15 @@ error:
 
 bool loadTitleExheaderInfo(u64 progId, ExHeader_Info *exheaderInfo)
 {
-    /* Here we look for "/luma/titles/[u64 titleID in hex, uppercase]/exheader.bin"
+    /* Here we look for "/omiiba/titles/[u64 titleID in hex, uppercase]/exheader.bin"
        If it exists it should be a decrypted exheader / exheader info */
 
-    char path[] = "/luma/titles/0000000000000000/exheader.bin";
+    char path[] = "/omiiba/titles/0000000000000000/exheader.bin";
     progIdToStr(path + 28, progId);
 
     IFile file;
 
-    if(!openLumaFile(&file, path)) return false;
+    if(!openOmiibaFile(&file, path)) return false;
 
     u64 fileSize;
 
@@ -467,16 +467,16 @@ error:
 
 static inline bool loadTitleLocaleConfig(u64 progId, u8 *mask, u8 *regionId, u8 *languageId, u8 *countryId, u8 *stateId)
 {
-    /* Here we look for "/luma/titles/[u64 titleID in hex, uppercase]/locale.txt"
+    /* Here we look for "/omiiba/titles/[u64 titleID in hex, uppercase]/locale.txt"
        If it exists it should contain, for example, "EUR IT" */
 
-    char path[] = "/luma/titles/0000000000000000/locale.txt";
+    char path[] = "/omiiba/titles/0000000000000000/locale.txt";
     progIdToStr(path + 28, progId);
     *mask = *regionId = *languageId = *countryId = *stateId = 0;
 
     IFile file;
 
-    if(!openLumaFile(&file, path)) return false;
+    if(!openOmiibaFile(&file, path)) return false;
 
     bool ret = false;
     u64 fileSize;
@@ -564,13 +564,13 @@ exit:
 
 static inline bool patchLayeredFs(u64 progId, u8 *code, u32 size, u32 textSize, u32 roSize, u32 dataSize, u32 roAddress, u32 dataAddress)
 {
-    /* Here we look for "/luma/titles/[u64 titleID in hex, uppercase]/romfs"
+    /* Here we look for "/omiiba/titles/[u64 titleID in hex, uppercase]/romfs"
        If it exists it should be a folder containing ROMFS files */
 
-    char path[] = "/luma/titles/0000000000000000/romfs";
+    char path[] = "/omiiba/titles/0000000000000000/romfs";
     progIdToStr(path + 28, progId);
 
-    u32 archiveId = checkLumaDir(path);
+    u32 archiveId = checkOmiibaDir(path);
 
     if(!archiveId) return true;
 
@@ -1006,7 +1006,7 @@ void patchCode(u64 progId, u16 progVer, u8 *code, u32 size, u32 textSize, u32 ro
                countryId,
                stateId;
 
-            if(isLumaWithKext && loadTitleLocaleConfig(progId, &mask, &regionId, &languageId, &countryId, &stateId))
+            if(isOmiibaWithKext && loadTitleLocaleConfig(progId, &mask, &regionId, &languageId, &countryId, &stateId))
                 svcKernelSetState(0x10001, ((u32)stateId << 24) | ((u32)countryId << 16) | ((u32)languageId << 8) | ((u32)regionId << 4) | (u32)mask , progId);
             if(!patchLayeredFs(progId, code, size, textSize, roSize, dataSize, roAddress, dataAddress)) goto error;
         }

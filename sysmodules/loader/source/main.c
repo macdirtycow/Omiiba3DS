@@ -10,7 +10,7 @@
 #include "hbldr.h"
 
 u32 config, multiConfig, bootConfig;
-bool isN3DS, isSdMode, nextGamePatchDisabled, isLumaWithKext;
+bool isN3DS, isSdMode, nextGamePatchDisabled, isOmiibaWithKext;
 
 // MAKE SURE fsreg has been init before calling this
 static Result fsldrPatchPermissions(void)
@@ -33,8 +33,8 @@ static inline void loadCFWInfo(void)
     s64 out;
     u64 hbldrTid = 0;
 
-    isLumaWithKext = svcGetSystemInfo(&out, 0x20000, 0) == 1;
-    if (isLumaWithKext)
+    isOmiibaWithKext = svcGetSystemInfo(&out, 0x20000, 0) == 1;
+    if (isOmiibaWithKext)
     {
         svcGetSystemInfo(&out, 0x10000, 3);
         config = (u32)out;
@@ -52,7 +52,7 @@ static inline void loadCFWInfo(void)
     }
     else
     {
-        // Try to support non-Luma or builds where kext is disabled
+        // Try to support non-Omiiba or builds where kext is disabled
         s64 numKips = 0;
         svcGetSystemInfo(&numKips, 26, 0);
 
@@ -72,9 +72,9 @@ static inline void loadCFWInfo(void)
     }
 
     hbldrTid = hbldrTid == 0 ? HBLDR_DEFAULT_3DSX_TID : hbldrTid;
-    Luma_SharedConfig->hbldr_3dsx_tid = hbldrTid;
-    Luma_SharedConfig->selected_hbldr_3dsx_tid = hbldrTid;
-    Luma_SharedConfig->use_hbldr = true;
+    Omiiba_SharedConfig->hbldr_3dsx_tid = hbldrTid;
+    Omiiba_SharedConfig->selected_hbldr_3dsx_tid = hbldrTid;
+    Omiiba_SharedConfig->use_hbldr = true;
 }
 
 void __ctru_exit(int rc) { (void)rc; } // needed to avoid linking error

@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2020 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -40,10 +40,10 @@
 #include "memory.h"
 #include "fmt.h"
 #include "process_patches.h"
-#include "luma_config.h"
+#include "omiiba_config.h"
 
 Menu rosalinaMenu = {
-    "Rosalina menu",
+    "Cow menu",
     {
         { "Take screenshot", METHOD, .method = &RosalinaMenu_TakeScreenshot },
         { "Screen filters...", MENU, .menu = &screenFiltersMenu },
@@ -75,7 +75,7 @@ bool rosalinaMenuShouldShowDebugInfo(void)
 
 void RosalinaMenu_SaveSettings(void)
 {
-    Result res = LumaConfig_SaveSettings();
+    Result res = OmiibaConfig_SaveSettings();
     Draw_Lock();
     Draw_ClearFramebuffer();
     Draw_FlushFramebuffer();
@@ -138,7 +138,7 @@ void RosalinaMenu_ShowSystemInfo(void)
     do
     {
         Draw_Lock();
-        Draw_DrawString(10, 10, COLOR_TITLE, "Rosalina -- System info");
+        Draw_DrawString(10, 10, COLOR_TITLE, "Cow menu -- System info");
 
         u32 posY = 30;
 
@@ -182,7 +182,7 @@ void RosalinaMenu_ShowDebugInfo(void)
     do
     {
         Draw_Lock();
-        Draw_DrawString(10, 10, COLOR_TITLE, "Rosalina -- Debug info");
+        Draw_DrawString(10, 10, COLOR_TITLE, "Cow menu -- Debug info");
 
         u32 posY = 30;
 
@@ -226,7 +226,7 @@ void RosalinaMenu_ShowCredits(void)
     do
     {
         Draw_Lock();
-        Draw_DrawString(10, 10, COLOR_TITLE, "Rosalina -- Luma3DS credits");
+        Draw_DrawString(10, 10, COLOR_TITLE, "Cow menu -- Luma3DS credits");
 
         u32 posY = Draw_DrawString(10, 30, COLOR_WHITE, "Luma3DS (c) 2016-2026 LumaTeam") + SPACING_Y;
 
@@ -236,12 +236,22 @@ void RosalinaMenu_ShowCredits(void)
 
         posY += 2 * SPACING_Y;
 
-        Draw_DrawString(10, posY, COLOR_WHITE,
+        posY = Draw_DrawString(10, posY, COLOR_WHITE,
             (
                 "Special thanks to:\n"
                 "  fincs, WinterMute, mtheall, piepie62,\n"
                 "  Luma3DS contributors, libctru contributors,\n"
                 "  other people"
+            ));
+
+        posY += 2 * SPACING_Y;
+
+        Draw_DrawString(10, posY, COLOR_TITLE,
+            (
+                "Omiiba3DS is an unofficial fork of Luma3DS,\n"
+                "rebranded for educational purposes only.\n"
+                "Source: https://github.com/LumaTeam/Luma3DS\n"
+                "Distributed under the GNU GPL v3 (see LICENSE.txt)."
             ));
 
         Draw_FlushFramebuffer();
@@ -336,7 +346,7 @@ void RosalinaMenu_TakeScreenshot(void)
     IFile file = {0};
     Result res = 0;
 
-    char filename[64];
+    char filename[128];
     char dateTimeStr[32];
 
     FS_Archive archive;
@@ -366,7 +376,7 @@ void RosalinaMenu_TakeScreenshot(void)
     res = FSUSER_OpenArchive(&archive, archiveId, fsMakePath(PATH_EMPTY, ""));
     if(R_SUCCEEDED(res))
     {
-        res = FSUSER_CreateDirectory(archive, fsMakePath(PATH_ASCII, "/luma/screenshots"), 0);
+        res = FSUSER_CreateDirectory(archive, fsMakePath(PATH_ASCII, "/omiiba/screenshots"), 0);
         if((u32)res == 0xC82044BE) // directory already exists
             res = 0;
         FSUSER_CloseArchive(archive);
@@ -379,19 +389,19 @@ void RosalinaMenu_TakeScreenshot(void)
 
     dateTimeToString(dateTimeStr, osGetTime(), true);
 
-    sprintf(filename, "/luma/screenshots/%s_top.bmp", dateTimeStr);
+    sprintf(filename, "/omiiba/screenshots/%s_top.bmp", dateTimeStr);
     TRY(IFile_Open(&file, archiveId, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, filename), FS_OPEN_CREATE | FS_OPEN_WRITE));
     TRY(RosalinaMenu_WriteScreenshot(&file, topWidth, true, true));
     TRY(IFile_Close(&file));
 
-    sprintf(filename, "/luma/screenshots/%s_bot.bmp", dateTimeStr);
+    sprintf(filename, "/omiiba/screenshots/%s_bot.bmp", dateTimeStr);
     TRY(IFile_Open(&file, archiveId, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, filename), FS_OPEN_CREATE | FS_OPEN_WRITE));
     TRY(RosalinaMenu_WriteScreenshot(&file, bottomWidth, false, true));
     TRY(IFile_Close(&file));
 
     if(is3d && (Draw_GetCurrentFramebufferAddress(true, true) != Draw_GetCurrentFramebufferAddress(true, false)))
     {
-        sprintf(filename, "/luma/screenshots/%s_top_right.bmp", dateTimeStr);
+        sprintf(filename, "/omiiba/screenshots/%s_top_right.bmp", dateTimeStr);
         TRY(IFile_Open(&file, archiveId, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, filename), FS_OPEN_CREATE | FS_OPEN_WRITE));
         TRY(RosalinaMenu_WriteScreenshot(&file, topWidth, true, false));
         TRY(IFile_Close(&file));
@@ -471,7 +481,7 @@ void menuTakeSelfScreenshot(void)
     IFile file = {0};
     Result res = 0;
 
-    char filename[100];
+    char filename[128];
     char dateTimeStr[64];
 
     FS_Archive archive;
@@ -492,7 +502,7 @@ void menuTakeSelfScreenshot(void)
     res = FSUSER_OpenArchive(&archive, archiveId, fsMakePath(PATH_EMPTY, ""));
     if(R_SUCCEEDED(res))
     {
-        res = FSUSER_CreateDirectory(archive, fsMakePath(PATH_ASCII, "/luma/screenshots"), 0);
+        res = FSUSER_CreateDirectory(archive, fsMakePath(PATH_ASCII, "/omiiba/screenshots"), 0);
         if((u32)res == 0xC82044BE) // directory already exists
             res = 0;
         FSUSER_CloseArchive(archive);
@@ -505,7 +515,7 @@ void menuTakeSelfScreenshot(void)
 
     dateTimeToString(dateTimeStr, osGetTime(), true);
 
-    sprintf(filename, "/luma/screenshots/rosalina_menu_%s.bmp", dateTimeStr);
+    sprintf(filename, "/omiiba/screenshots/rosalina_menu_%s.bmp", dateTimeStr);
 
     TRY(IFile_Open(&file, archiveId, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, filename), FS_OPEN_CREATE | FS_OPEN_WRITE));
     TRY(menuWriteSelfScreenshot(&file));

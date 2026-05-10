@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2020 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@
 
 #include "config_template_ini.h" // note that it has an extra NUL byte inserted
 
-#define MAKE_LUMA_VERSION_MCU(major, minor, build) (u16)(((major) & 0xFF) << 8 | ((minor) & 0x1F) << 5 | ((build) & 7))
+#define MAKE_OMIIBA_VERSION_MCU(major, minor, build) (u16)(((major) & 0xFF) << 8 | ((minor) & 0x1F) << 5 | ((build) & 7))
 
 #define FLOAT_CONV_MULT 100000000ll
 #define FLOAT_CONV_PRECISION 8u
@@ -360,7 +360,7 @@ static int configIniHandler(void* user, const char* section, const char* name, c
             CHECK_PARSE_OPTION(-1);
         }
     } else if (strcmp(section, "boot") == 0) {
-        // Simple options displayed on the Luma3DS boot screen
+        // Simple options displayed on the Omiiba3DS boot screen
         for (size_t i = 0; i < sizeof(singleOptionIniNamesBoot)/sizeof(singleOptionIniNamesBoot[0]); i++) {
             if (strcmp(name, singleOptionIniNamesBoot[i]) == 0) {
                 bool opt;
@@ -370,7 +370,7 @@ static int configIniHandler(void* user, const char* section, const char* name, c
             }
         }
 
-        // Multi-choice options displayed on the Luma3DS boot screen
+        // Multi-choice options displayed on the Omiiba3DS boot screen
 
         if (strcmp(name, "default_emunand_number") == 0) {
             s64 opt;
@@ -589,12 +589,12 @@ static int configIniHandler(void* user, const char* section, const char* name, c
     }
 }
 
-static size_t saveLumaIniConfigToStr(char *out)
+static size_t saveOmiibaIniConfigToStr(char *out)
 {
     const CfgData *cfg = &configData;
 
-    char lumaVerStr[64];
-    char lumaRevSuffixStr[16];
+    char omiibaVerStr[64];
+    char omiibaRevSuffixStr[16];
     char rosalinaMenuComboStr[128];
 
     const char *splashPosStr;
@@ -628,15 +628,15 @@ static size_t saveLumaIniConfigToStr(char *out)
     }
 
     if (VERSION_BUILD != 0) {
-        sprintf(lumaVerStr, "Luma3DS v%d.%d.%d", (int)VERSION_MAJOR, (int)VERSION_MINOR, (int)VERSION_BUILD);
+        sprintf(omiibaVerStr, "Omiiba3DS v%d.%d.%d", (int)VERSION_MAJOR, (int)VERSION_MINOR, (int)VERSION_BUILD);
     } else {
-        sprintf(lumaVerStr, "Luma3DS v%d.%d", (int)VERSION_MAJOR, (int)VERSION_MINOR);
+        sprintf(omiibaVerStr, "Omiiba3DS v%d.%d", (int)VERSION_MAJOR, (int)VERSION_MINOR);
     }
 
     if (ISRELEASE) {
-        strcpy(lumaRevSuffixStr, "");
+        strcpy(omiibaRevSuffixStr, "");
     } else {
-        sprintf(lumaRevSuffixStr, "-%08lx", (u32)COMMIT_HASH);
+        sprintf(omiibaRevSuffixStr, "-%08lx", (u32)COMMIT_HASH);
     }
 
     menuComboToString(rosalinaMenuComboStr, cfg->rosalinaMenuCombo);
@@ -660,7 +660,7 @@ static size_t saveLumaIniConfigToStr(char *out)
 
     int n = sprintf(
         out, (const char *)config_template_ini,
-        lumaVerStr, lumaRevSuffixStr,
+        omiibaVerStr, omiibaRevSuffixStr,
 
         (int)CONFIG_VERSIONMAJOR, (int)CONFIG_VERSIONMINOR,
         (int)CONFIG(AUTOBOOTEMU), (int)CONFIG(LOADEXTFIRMSANDMODULES),
@@ -696,7 +696,7 @@ static size_t saveLumaIniConfigToStr(char *out)
 
 static char tmpIniBuffer[0x2000 + 0x400]; // eyeballed. TODO use #embed
 
-static bool readLumaIniConfig(void)
+static bool readOmiibaIniConfig(void)
 {
     u32 rd = fileRead(tmpIniBuffer, "config.ini", sizeof(tmpIniBuffer) - 1);
     if (rd == 0) return false;
@@ -706,9 +706,9 @@ static bool readLumaIniConfig(void)
     return ini_parse_string(tmpIniBuffer, &configIniHandler, &configData) >= 0 && !hasIniParseError;
 }
 
-static bool writeLumaIniConfig(void)
+static bool writeOmiibaIniConfig(void)
 {
-    size_t n = saveLumaIniConfigToStr(tmpIniBuffer);
+    size_t n = saveOmiibaIniConfigToStr(tmpIniBuffer);
 
     // FIXME: this is UB we should port snprintf sometime (as well as fix other tech debt)
     if (n + 1 >= sizeof(tmpIniBuffer)) {
@@ -725,8 +725,8 @@ static void writeConfigMcu(void)
 {
     u8 data[sizeof(CfgDataMcu)];
 
-    // Set Luma version
-    configDataMcu.lumaVersion = MAKE_LUMA_VERSION_MCU(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+    // Set Omiiba3DS version
+    configDataMcu.omiibaVersion = MAKE_OMIIBA_VERSION_MCU(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 
     // Set bootconfig from CfgData
     configDataMcu.bootCfg = configData.bootConfig;
@@ -748,7 +748,7 @@ static void writeConfigMcu(void)
 static bool readConfigMcu(void)
 {
     u8 data[sizeof(CfgDataMcu)];
-    u16 curVer = MAKE_LUMA_VERSION_MCU(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+    u16 curVer = MAKE_OMIIBA_VERSION_MCU(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 
     // Select free reg id, then access the data regs
     I2C_writeReg(I2C_DEV_MCU, 0x60, 200 - sizeof(CfgDataMcu));
@@ -760,22 +760,22 @@ static bool readConfigMcu(void)
         checksum += data[i];
     checksum = ~checksum;
 
-    if (checksum != configDataMcu.checksum || configDataMcu.lumaVersion < MAKE_LUMA_VERSION_MCU(10, 3, 0))
+    if (checksum != configDataMcu.checksum || configDataMcu.omiibaVersion < MAKE_OMIIBA_VERSION_MCU(10, 3, 0))
     {
         // Invalid data stored in MCU...
         memset(&configDataMcu, 0, sizeof(CfgDataMcu));
         configData.bootConfig = 0;
         // Perform upgrade process (ignoring failures)
-        doLumaUpgradeProcess();
+        doOmiibaUpgradeProcess();
         writeConfigMcu();
 
         return false;
     }
 
-    if (configDataMcu.lumaVersion < curVer)
+    if (configDataMcu.omiibaVersion < curVer)
     {
         // Perform upgrade process (ignoring failures)
-        doLumaUpgradeProcess();
+        doOmiibaUpgradeProcess();
         writeConfigMcu();
     }
 
@@ -787,7 +787,7 @@ bool readConfig(void)
     bool retMcu, ret;
 
     retMcu = readConfigMcu();
-    ret = readLumaIniConfig();
+    ret = readOmiibaIniConfig();
     if(!retMcu || !ret ||
        configData.formatVersionMajor != CONFIG_VERSIONMAJOR ||
        configData.formatVersionMinor != CONFIG_VERSIONMINOR)
@@ -835,7 +835,7 @@ void writeConfig(bool isConfigOptions)
     if (updateMcu)
         writeConfigMcu();
 
-    if(updateIni && !writeLumaIniConfig())
+    if(updateIni && !writeOmiibaIniConfig())
         error("Error writing the configuration file");
 }
 
@@ -880,7 +880,7 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
 
                                                  "Activate a PIN lock.\n\n"
                                                  "The PIN will be asked each time\n"
-                                                 "Luma3DS boots.\n\n"
+                                                 "Omiiba3DS boots.\n\n"
                                                  "4, 6 or 8 digits can be selected.\n\n"
                                                  "The ABXY buttons and the directional\n"
                                                  "pad buttons can be used as keys.\n\n"
@@ -945,7 +945,7 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
                                                  "when booting GBA games.",
 
                                                 // Should always be the last 2 entries
-                                                "Boot to the Luma3DS chainloader menu.",
+                                                "Boot to the Omiiba3DS chainloader menu.",
 
                                                  "Save the changes and exit. To discard\n"
                                                  "any changes press the POWER button.\n"

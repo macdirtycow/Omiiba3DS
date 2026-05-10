@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2017-2018 Sono (https://github.com/MarcuzD), panicbit
 *
 *   This program is free software: you can redistribute it and/or modify

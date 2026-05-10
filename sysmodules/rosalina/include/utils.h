@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2020 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@
 #include <3ds/ipc.h>
 #include <assert.h>
 #include "csvc.h"
-#include "luma_shared_config.h"
+#include "omiiba_shared_config.h"
 
 // For accessing physmem uncached (and directly)
 #define PA_PTR(addr)            (void *)((u32)(addr) | 1 << 31)

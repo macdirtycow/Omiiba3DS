@@ -42,7 +42,7 @@ static bool checkServiceAccess(SessionData *sessionData, const char *name, s32 n
     (void)name;
     (void)nameSize;
 
-    return true; // Service access list checks removed for Luma3DS, see original 3ds_sm for implementation details.
+    return true; // Service access list checks removed for Omiiba3DS, see original 3ds_sm for implementation details.
 }
 
 static Result doRegisterServiceOrPort(u32 pid, Handle *serverPort, Handle clientPort, const char *name, s32 nameSize, s32 maxSessions, bool isNamedPort)

@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2020 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -73,7 +73,7 @@
 #define SPACING_Y 11
 #define SPACING_X 6
 
-#define COLOR_TITLE RGB565(0x00, 0x26, 0x1F)
+#define COLOR_TITLE RGB565(0x00, 0x3F, 0x00) // Omiiba3DS: bright green (was Rosalina cyan)
 #define COLOR_WHITE RGB565(0x1F, 0x3F, 0x1F)
 #define COLOR_RED   RGB565(0x1F, 0x00, 0x00)
 #define COLOR_GREEN RGB565(0x00, 0x1F, 0x00)

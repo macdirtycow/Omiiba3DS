@@ -7,7 +7,7 @@
 #include "exheader_info_heap.h"
 #include "task_runner.h"
 #include "util.h"
-#include "luma.h"
+#include "omiiba.h"
 
 static bool g_debugNextApplication = false;
 

@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2020 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -91,7 +91,7 @@ typedef struct CfgData {
 
 typedef struct
 {
-    u16 lumaVersion;
+    u16 omiibaVersion;
     u8 bootCfg;
     u8 reserved[2];
     u8 checksum;

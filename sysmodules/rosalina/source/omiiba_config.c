@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2023 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 #include <3ds.h>
 #include "memory.h"
 #include "fmt.h"
-#include "luma_config.h"
+#include "omiiba_config.h"
 #include "screen_filters.h"
 #include "config_template_ini.h"
 #include "ifile.h"
@@ -56,7 +56,7 @@ typedef struct CfgData {
 
 bool saveSettingsRequest = false;
 
-void LumaConfig_ConvertComboToString(char *out, u32 combo)
+void OmiibaConfig_ConvertComboToString(char *out, u32 combo)
 {
     static const char *keys[] = {
         "A", "B", "Select", "Start", "Right", "Left", "Up", "Down", "R", "L", "X", "Y",
@@ -85,10 +85,10 @@ void LumaConfig_ConvertComboToString(char *out, u32 combo)
         out[-1] = 0;
 }
 
-static size_t LumaConfig_SaveLumaIniConfigToStr(char *out, const CfgData *cfg)
+static size_t OmiibaConfig_SaveOmiibaIniConfigToStr(char *out, const CfgData *cfg)
 {
-    char lumaVerStr[64];
-    char lumaRevSuffixStr[16];
+    char omiibaVerStr[64];
+    char omiibaRevSuffixStr[16];
     char rosalinaMenuComboStr[128];
 
     const char *splashPosStr;
@@ -132,18 +132,18 @@ static size_t LumaConfig_SaveLumaIniConfigToStr(char *out, const CfgData *cfg)
     }
 
     if (GET_VERSION_REVISION(version) != 0) {
-        sprintf(lumaVerStr, "Luma3DS v%d.%d.%d", (int)GET_VERSION_MAJOR(version), (int)GET_VERSION_MINOR(version), (int)GET_VERSION_REVISION(version));
+        sprintf(omiibaVerStr, "Omiiba3DS v%d.%d.%d", (int)GET_VERSION_MAJOR(version), (int)GET_VERSION_MINOR(version), (int)GET_VERSION_REVISION(version));
     } else {
-        sprintf(lumaVerStr, "Luma3DS v%d.%d",  (int)GET_VERSION_MAJOR(version), (int)GET_VERSION_MINOR(version));
+        sprintf(omiibaVerStr, "Omiiba3DS v%d.%d",  (int)GET_VERSION_MAJOR(version), (int)GET_VERSION_MINOR(version));
     }
 
     if (isRelease) {
-        strcpy(lumaRevSuffixStr, "");
+        strcpy(omiibaRevSuffixStr, "");
     } else {
-        sprintf(lumaRevSuffixStr, "-%08lx", (u32)commitHash);
+        sprintf(omiibaRevSuffixStr, "-%08lx", (u32)commitHash);
     }
 
-    LumaConfig_ConvertComboToString(rosalinaMenuComboStr, cfg->rosalinaMenuCombo);
+    OmiibaConfig_ConvertComboToString(rosalinaMenuComboStr, cfg->rosalinaMenuCombo);
 
     static const int pinOptionToDigits[] = { 0, 4, 6, 8 };
     int pinNumDigits = pinOptionToDigits[MULTICONFIG(PIN)];
@@ -164,7 +164,7 @@ static size_t LumaConfig_SaveLumaIniConfigToStr(char *out, const CfgData *cfg)
 
     int n = sprintf(
         out, (const char *)config_template_ini,
-        lumaVerStr, lumaRevSuffixStr,
+        omiibaVerStr, omiibaRevSuffixStr,
 
         (int)cfg->formatVersionMajor, (int)cfg->formatVersionMinor,
         (int)CONFIG(AUTOBOOTEMU), (int)CONFIG(LOADEXTFIRMSANDMODULES),
@@ -198,11 +198,11 @@ static size_t LumaConfig_SaveLumaIniConfigToStr(char *out, const CfgData *cfg)
     return n < 0 ? 0 : (size_t)n;
 }
 
-void LumaConfig_RequestSaveSettings(void) {
+void OmiibaConfig_RequestSaveSettings(void) {
     saveSettingsRequest = true;
 }
 
-Result LumaConfig_SaveSettings(void)
+Result OmiibaConfig_SaveSettings(void)
 {
     char inibuf[0x2000 + 0x400]; // eyeballed. TODO use #embed
 
@@ -249,7 +249,7 @@ Result LumaConfig_SaveSettings(void)
     configData.bootConfig = bootConfig;
     configData.splashDurationMsec = splashDurationMsec;
     configData.volumeSliderOverride = currVolumeSliderOverride;
-    configData.hbldr3dsxTitleId = Luma_SharedConfig->selected_hbldr_3dsx_tid;
+    configData.hbldr3dsxTitleId = Omiiba_SharedConfig->selected_hbldr_3dsx_tid;
     configData.rosalinaMenuCombo = menuCombo;
     configData.pluginLoaderFlags = PluginLoader__IsEnabled();
     configData.ntpTzOffetMinutes = (s16)lastNtpTzOffset;
@@ -258,7 +258,7 @@ Result LumaConfig_SaveSettings(void)
     configData.autobootTwlTitleId = autobootTwlTitleId;
     configData.autobootCtrAppmemtype = autobootCtrAppmemtype;
 
-    size_t n = LumaConfig_SaveLumaIniConfigToStr(inibuf, &configData);
+    size_t n = OmiibaConfig_SaveOmiibaIniConfigToStr(inibuf, &configData);
 
     // FIXME: this is UB we should port snprintf sometime (as well as fix other tech debt in Rosalina)
     if (n + 1 >= sizeof(inibuf)) {
@@ -267,7 +267,7 @@ Result LumaConfig_SaveSettings(void)
 
     FS_ArchiveID archiveId = isSdMode ? ARCHIVE_SDMC : ARCHIVE_NAND_RW;
     if (n > 0)
-        res = IFile_Open(&file, archiveId, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/luma/config.ini"), FS_OPEN_CREATE | FS_OPEN_WRITE);
+        res = IFile_Open(&file, archiveId, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/omiiba/config.ini"), FS_OPEN_CREATE | FS_OPEN_WRITE);
     else
         res = -1;
 

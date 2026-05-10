@@ -3,7 +3,7 @@
 <osdata type="types">
   <item>
     <column name="Type">cfwversion</column>
-    <column name="Description">Listing of the Luma3DS version, commit hash, etc.</column>
+    <column name="Description">Listing of the Omiiba3DS version, commit hash, etc.</column>
     <column name="Title">CFW</column>
   </item>
   <item>

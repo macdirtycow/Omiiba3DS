@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2020 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -219,7 +219,7 @@ u32 installK11Extension(u8 *pos, u32 size, bool needToInitSd, u32 baseK11VA, u32
     }
 
     struct CfwInfo *info = &p->info;
-    memcpy(&info->magic, "LUMA", 4);
+    memcpy(&info->magic, "OMIB", 4);
     info->commitHash = COMMIT_HASH;
     info->configFormatVersionMajor = configData.formatVersionMajor;
     info->configFormatVersionMinor = configData.formatVersionMinor;

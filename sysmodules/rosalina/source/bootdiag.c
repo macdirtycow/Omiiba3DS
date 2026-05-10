@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2022  TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -120,7 +120,7 @@ static void bootdiagThreadMain(void)
 
     if (R_FAILED(fsInit())) __builtin_trap();
 
-    IFile_Open(&file, archiveId, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/luma/bootdiag.txt"), FS_OPEN_CREATE | FS_OPEN_WRITE);
+    IFile_Open(&file, archiveId, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/omiiba/bootdiag.txt"), FS_OPEN_CREATE | FS_OPEN_WRITE);
     u64 ttl = 0;
     IFile_Write(file, &ttl, buf, (u32)n, 0);
     IFile_Close(&file);

@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2020 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -280,7 +280,7 @@ static Result ERRF_SaveErrorToFile(ERRF_FatalErrInfo *info)
     n += sprintf(buf + n, "-------------------------------------\n\n");
 
     archiveId = isSdMode ? ARCHIVE_SDMC : ARCHIVE_NAND_RW;
-    res = IFile_Open(&file, archiveId, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/luma/errdisp.txt"), FS_OPEN_WRITE | FS_OPEN_CREATE);
+    res = IFile_Open(&file, archiveId, fsMakePath(PATH_EMPTY, ""), fsMakePath(PATH_ASCII, "/omiiba/errdisp.txt"), FS_OPEN_WRITE | FS_OPEN_CREATE);
 
     if(R_FAILED(res))
         return res;

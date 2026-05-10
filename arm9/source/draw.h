@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2020 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@
 #define SPACING_Y 10
 #define SPACING_X 8
 
-#define COLOR_TITLE  0xFF9900
+#define COLOR_TITLE  0x33FF00 // Omiiba3DS: bright green (was Luma3DS cyan)
 #define COLOR_WHITE  0xFFFFFF
 #define COLOR_RED    0x0000FF
 #define COLOR_GREEN  0x00FF00
@@ -46,6 +46,7 @@
 #define DRAW_MAX_FORMATTED_STRING_SIZE  512
 
 bool loadSplash(void);
+void omiibaBootSplash(void);
 void drawCharacter(bool isTopScreen, u32 posX, u32 posY, u32 color, char character);
 u32 drawString(bool isTopScreen, u32 posX, u32 posY, u32 color, const char *string);
 

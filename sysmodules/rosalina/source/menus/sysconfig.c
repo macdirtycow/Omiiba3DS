@@ -1,5 +1,5 @@
 /*
-*   This file is part of Luma3DS
+*   This file is part of Omiiba3DS
 *   Copyright (C) 2016-2021 Aurora Wright, TuxSH
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 */
 
 #include <3ds.h>
-#include "luma_config.h"
+#include "omiiba_config.h"
 #include "menus/sysconfig.h"
 #include "memory.h"
 #include "draw.h"
@@ -510,7 +510,7 @@ void SysConfigMenu_AdjustVolume(void)
         {
             currVolumeSliderOverride = tempVolumeOverride;
             Result res = SysConfigMenu_ApplyVolumeOverride();
-            LumaConfig_SaveSettings();
+            OmiibaConfig_SaveSettings();
             if (R_SUCCEEDED(res))
                 Draw_DrawString(10, posY, COLOR_GREEN, "\nSuccess!");
             else

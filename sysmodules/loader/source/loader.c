@@ -509,7 +509,7 @@ static Result RegisterProgram(u64 *programHandle, FS_ProgramInfo *title, FS_Prog
             res = openSysmoduleCxi(&g_cached_sysmoduleCxiFile, tid2);
             if (R_SUCCEEDED(res))
             {
-                // A .cxi with the correct name in /luma/sysmodule exists, proceed (ignoring N3DS TID bits)
+                // A .cxi with the correct name in /omiiba/sysmodule exists, proceed (ignoring N3DS TID bits)
                 *programHandle = SYSMODULE_CXI_COOKIE_MASK | (u32)tid2;
                 g_cached_sysmoduleCxiCookie = *programHandle;
                 loadedCxiFromStorage = true;

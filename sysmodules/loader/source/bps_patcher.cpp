@@ -252,7 +252,7 @@ static inline bool ApplyCodeBpsPatch(u64 prog_id, u8 *code, u32 size)
 
     if (isSysmodule)
     {
-        char bps_path[] = "/luma/sysmodules/0000000000000000.bps";
+        char bps_path[] = "/omiiba/sysmodules/0000000000000000.bps";
         prog_id &= ~0xF0000000ull; // clear N3DS bit
         progIdToStr(bps_path + 32, prog_id);
         if(!patch_file.Open(bps_path, FS_OPEN_READ))
@@ -260,7 +260,7 @@ static inline bool ApplyCodeBpsPatch(u64 prog_id, u8 *code, u32 size)
     }
     else
     {
-        char bps_path[] = "/luma/titles/0000000000000000/code.bps";
+        char bps_path[] = "/omiiba/titles/0000000000000000/code.bps";
         progIdToStr(bps_path + 28, prog_id);
         if(!patch_file.Open(bps_path, FS_OPEN_READ))
             return true;

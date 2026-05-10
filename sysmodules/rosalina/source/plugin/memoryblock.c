@@ -270,7 +270,7 @@ void       MemoryBlock__ResetSwapSettings(void)
 		savePhysAddr[i] = loadPhysAddr[i] = 0xE320F000; // NOP
 	}
 
-	strcpy(g_swapFileName, "/luma/plugins/.swap");
+	strcpy(g_swapFileName, "/omiiba/plugins/.swap");
     ctx->isSwapFunctionset = false;
 
 	svcInvalidateEntireInstructionCache();

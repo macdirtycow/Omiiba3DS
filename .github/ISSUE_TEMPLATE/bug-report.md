@@ -1,21 +1,21 @@
 ---
 name: Bug report
-about: Use this to report bugs you encounter with Luma3DS. Make sure you upload the crash dumps if Luma3DS crashes.
+about: Use this to report bugs you encounter with Omiiba3DS. Make sure you upload the crash dumps if Omiiba3DS crashes.
 ---
 
 <!--
 -- THIS IS NOT A SUPPORT FORUM! For support go here:
 -- Nintendo Homebrew: https://discord.gg/MjzatM8
 --
--- Rosalina feature requests go here: https://github.com/LumaTeam/Luma3DS/issues/752
+-- Rosalina feature requests go here: https://github.com/OmiibaTeam/Omiiba3DS/issues/752
 --
--- Also check the Wiki (https://github.com/LumaTeam/Luma3DS/wiki) before making an issue.
+-- Also check the Wiki (https://github.com/OmiibaTeam/Omiiba3DS/wiki) before making an issue.
 --
 -- For GBA/DSiWare/DS/AGB_FIRM/TWL_FIRM problems: use https://github.com/MechanicalDragon0687/TWLFix-CFW and update your system.
 -- If you're using an emu/redNAND try installing anything on it to sysNAND.
--- Please make sure to read "Enable game patching" https://github.com/LumaTeam/Luma3DS/wiki/Options-and-usage before posting any issues about the "Enable game patching" option(s).
+-- Please make sure to read "Enable game patching" https://github.com/OmiibaTeam/Omiiba3DS/wiki/Options-and-usage before posting any issues about the "Enable game patching" option(s).
 --
--- Luma updaters that don't support Boot9Strap/Sighax won't work.
+-- Omiiba3DS updaters that don't support Boot9Strap/Sighax won't work.
 -- This is due to support for non-B9S/Sighax entrypoints being dropped.
 --
 -- Please fill in the placeholders.-->
@@ -28,15 +28,15 @@ about: Use this to report bugs you encounter with Luma3DS. Make sure you upload 
 [e.g. 11.17.0-50U SysNAND, 11.17.0-50E EmuNAND]
 <!--You can check which version you're on in System Settings. It will be on the bottom right of the top screen.-->
 
-**Entrypoint (How/what you're using to boot Luma3DS):**
+**Entrypoint (How/what you're using to boot Omiiba3DS):**
 
 [e.g. Boot9Strap/Sighax, etc.]
 
-**Luma3DS version:**
+**Omiiba3DS version:**
 
-[e.g. v13.2.1 stable or if using non-releases specify the commit like this https://github.com/LumaTeam/Luma3DS/commit/988ec17ebfce513fc4589f7b12e0d6e3894ae542]
+[e.g. v13.2.1 stable or if using non-releases specify the commit like this https://github.com/OmiibaTeam/Omiiba3DS/commit/988ec17ebfce513fc4589f7b12e0d6e3894ae542]
 
-**Luma3DS configuration/options:**
+**Omiiba3DS configuration/options:**
 
 Default EmuNAND: ( )
 <!--This option is only available if there's at least one EmuNAND.-->
@@ -60,8 +60,8 @@ Autoboot EmuNAND: ( )
 <!--This option is only available if there's at least one EmuNAND.-->
 
 Enable loading external FIRMs and modules: ( )
-<!--Firmware (.bin) files are not required by Luma, or NTR CFW anymore.
--- If you're having issues with this option enabled try deleting them from the luma folder on the root of the SD card or /rw/luma on CTRNAND and disabling this option.-->
+<!--Firmware (.bin) files are not required by Omiiba3DS, or NTR CFW anymore.
+-- If you're having issues with this option enabled try deleting them from the omiiba folder on the root of the SD card or /rw/omiiba on CTRNAND and disabling this option.-->
 
 Enable game patching: ( )
 
