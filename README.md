@@ -1,15 +1,26 @@
 # Omiiba3DS
 
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/OmiibaTeam/Omiiba3DS/total)
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
 *Nintendo 3DS "Custom Firmware"*
+
+> **Omiiba3DS is an unofficial fork of [Luma3DS](https://github.com/LumaTeam/Luma3DS),
+> rebranded for educational purposes.**
+> All firmware functionality is the work of the original **LumaTeam**
+> (AuroraWright, TuxSH, PabloMK7 and contributors). This fork is not
+> affiliated with, endorsed by, or supported by LumaTeam — please direct
+> bug reports about anything other than the Omiiba3DS-specific changes to
+> the upstream project.
+>
+> A summary of every change made in this fork (as required by GPLv3 §5(a))
+> is in [`NOTICE-OMIIBA.md`](NOTICE-OMIIBA.md).
+> The full original GPLv3 text is in [`LICENSE`](LICENSE).
 
 ![Boot menu screenshot](img/boot_menu_v1321.png)
 ![Rosalina menu screenshot](img/rosalina_menu_v1321.png)
 
 ## Description
-**Omiiba3DS** patches and reimplements significant parts of the system software running on all models of the Nintendo 3DS family of consoles. It aims to greatly improve the user experience and support the 3DS far beyond its end-of-life. Features include:
+**Luma3DS** (the project this fork is built on) patches and reimplements significant parts of the system software running on all models of the Nintendo 3DS family of consoles. It aims to greatly improve the user experience and support the 3DS far beyond its end-of-life. Features inherited by Omiiba3DS include:
 
 * **First-class support for homebrew applications**
 * **Rosalina**, an overlay menu (triggered by <kbd>L+Down+Select</kbd> by default), allowing things like:
@@ -46,30 +57,49 @@ Configuration, layered FS data, plugins, screenshots, and payloads now live unde
 
 We have a wiki, however it is currently very outdated.
 
-## Components
+## What this fork actually changes
 
-Omiiba3DS consists of multiple components. While the code style within each component is mostly consistent, these components have been written over many years and may not reflect how maintainers would write new code in new components/projects:
+Everything in the *Description* section above was already present in upstream Luma3DS. The Omiiba3DS-specific differences are:
+
+* Project rebranded from "Luma3DS" / "LumaTeam" to "Omiiba3DS" in user-visible strings, file names and config paths
+* The on-card data folder moved from `/luma` to `/omiiba`, with an automatic one-shot migration on first boot
+* A custom textual coldboot splash screen (existing `splash.bin` / `splashbottom.bin` files keep working)
+* Rosalina overlay menu retitled "Cow menu" with a green title color
+* Hardcoded version `v1.3.x` (no longer derived from upstream Luma git tags)
+* A few helper build scripts under `scripts/`
+
+For the full per-file change list, see [`NOTICE-OMIIBA.md`](NOTICE-OMIIBA.md).
+
+## Components (inherited from Luma3DS)
+
+The firmware consists of multiple components, all originally written for **Luma3DS** by LumaTeam over many years. Omiiba3DS reuses them as-is apart from the rebrand:
 
 * **arm9**, **arm11**: baremetal main settings menu, chainloader and firmware loader. Aside from showing settings and chainloading to other homebrew firmware files on demand, it is responsible for patching the official firmware to modify `Process9` code and to inject all other custom components. This was the first component ever written for this project, in 2015
 * **k11_extension**: code extending the Arm11 `NATIVE_FIRM` kernel (`Kernel11`). It is injected by the above mentioned baremetal loader into the kernel by hooking its startup code, then hooks itself into the rest of the kernel. Its features include hooking system calls (SVCs), introducing new SVCs and hooking into interprocess communications, to bypass limitations in Nintendo's system design. This is the component that allows Rosalina to pause other processes on overlay menu entry, for example. This was written at a time when we didn't fully reverse-engineer the kernel, and originally released in 2017 alongside Rosalina. Further hooks for "game plugin" support have been merged in 2023
 * **sysmodules**: reimplementation of "system modules" (processes) of the 3DS's OS (except for Rosalina being custom), currently only initial processes loaded directly in-memory by the kernel ("kernel initial process", or KIP in short)
     * **loader**: process that loads non-KIP processes from storage. Because this is the perfect place to patch/replace executable code, this is where all process patches are done, enabling in particular "game modding" features. This is also the sysmodule handling 3DSX homebrew loading. Introduced in 2016
-    * _**rosalina**_: the most important component of Omiiba3DS and custom KIP: overlay menu, GDB server, `err:f` (fatal error screen) reimplementation, and much more. Introduced in mid-2017, and has continuously undergone changes and received many external contributions ever since
+    * _**rosalina**_: the most important custom KIP: overlay menu, GDB server, `err:f` (fatal error screen) reimplementation, and much more. Introduced in mid-2017, and has continuously undergone changes and received many external contributions ever since
     * **pxi**: Arm11<>Arm9 communication KIP, reimplemented just for the sake of it. Introduced late 2017
     * **sm**: service manager KIP, reimplemented to remove service access control restrictions. Introduced late 2017
     * **pm**: process manager KIP reponsible of starting/terminating processes and instructing `loader` to load them. The reimplemention allows for break-on-start GDB feature in Rosalina, as well as lifting FS access control restrictions the proper way. Introduced in 2019
 
-## Maintainers
+## Upstream maintainers (Luma3DS)
 
-* **[@TuxSH](https://github.com/TuxSH)**: lead developer, created and maintains most features of the project. Joined in 2016
-* **[@AuroraWright](https://github.com/AuroraWright)**: author of the project, implemented the core features (most of the baremetal boot settings menu and firmware loading code) with successful design decisions that made the project popular. Created the project in 2015, currently inactive
-* **[@PabloMK7](https://github.com/PabloMK7)**: maintainer of the plugin loader feature merged for the v13.0 release. Joined in 2023
+The firmware itself is the work of LumaTeam — please credit them, not this fork:
 
-## Roadmap
+* **[@TuxSH](https://github.com/TuxSH)**: lead developer of Luma3DS, created and maintains most features. Joined in 2016
+* **[@AuroraWright](https://github.com/AuroraWright)**: author of Luma3DS, implemented the core features (most of the baremetal boot settings menu and firmware loading code). Created the project in 2015, currently inactive
+* **[@PabloMK7](https://github.com/PabloMK7)**: maintainer of the plugin loader feature merged for the Luma3DS v13.0 release. Joined in 2023
 
-There are still a lot more features and consolidation planned for Omiiba3DS! Here is a list of what is currently in store:
+## Maintainer of this fork
 
-* Full reimplementation of `TwlBg` and `AgbBg`. This will allow much better, and more configurable, upscaling for top screen in DS and GBA games (except on Old 2DS). This is currently being developed privately in C++23 (no ETA). While this is quite a difficult endeavor as this requires rewriting the entire driver stack in semi-bare-metal (limited kernel with no IPC), this is the most critical feature for Omiiba3DS to have and will make driver sysmodule reimpelementation trivial
+* **[@Macdirtycow](https://github.com/Macdirtycow)** — created Omiiba3DS in May 2026 for educational purposes. Only the items listed in [`NOTICE-OMIIBA.md`](NOTICE-OMIIBA.md) are this fork's work.
+
+## Roadmap (upstream Luma3DS)
+
+These items are upstream Luma3DS plans, **not commitments by this fork**. Any of them landing in Omiiba3DS would be by merging future Luma3DS releases:
+
+* Full reimplementation of `TwlBg` and `AgbBg`. This will allow much better, and more configurable, upscaling for top screen in DS and GBA games (except on Old 2DS). This is currently being developed privately in C++23 by upstream (no ETA). While this is quite a difficult endeavor as this requires rewriting the entire driver stack in semi-bare-metal (limited kernel with no IPC), this is the most critical feature Luma3DS hopes to ship and will make driver sysmodule reimplementation trivial
 * Reimplementation of `Process9` for `TWL_FIRM` and `AGB_FIRM` to allow for more features in DS and GBA compatibility mode (ones that require file access)
 * Eventually, a full `Kernel11` reimplementation
 
@@ -94,14 +124,15 @@ To build Omiiba3DS, the following is needed:
 While Omiiba3DS releases are bundled with `3ds-hbmenu`, Omiiba3DS actually compiles into one single file: `boot.firm`. Just copy it over to the root of your SD card ([ftpd](https://github.com/mtheall/ftpd) is the easiest way to do so), and you're done.
 
 ## Licensing
-This software is licensed under the terms of the GPLv3. You can find a copy of the license in the LICENSE.txt file.
+This software is licensed under the terms of the GPLv3. You can find a copy of the license in the [`LICENSE`](LICENSE) file. Modifications made by this fork are documented in [`NOTICE-OMIIBA.md`](NOTICE-OMIIBA.md), as required by GPLv3 §5(a).
 
-Files in the GDB stub are instead triple-licensed as MIT or "GPLv2 or any later version", in which case it's specified in the file header. PM, SM, PXI reimplementations are also licensed under MIT.
+Files in the GDB stub are instead triple-licensed as MIT or "GPLv2 or any later version", in which case it's specified in the file header. PM, SM, PXI reimplementations are also licensed under MIT. All upstream copyright notices and per-file license headers have been preserved unchanged.
 
 ## Credits
 
-Omiiba3DS would not be what it is without the contributions and constructive feedback of many. We would like to thanks in particular:
+The list below is the original Luma3DS credits — preserved verbatim, because every line of it is also true of Omiiba3DS:
 
+* **[@AuroraWright](https://github.com/AuroraWright)**, **[@TuxSH](https://github.com/TuxSH)** and **[@PabloMK7](https://github.com/PabloMK7)** — authors and maintainers of [Luma3DS](https://github.com/LumaTeam/Luma3DS), on which Omiiba3DS is entirely based
 * **[@devkitPro](https://github.com/devkitPro)** (especially **[@fincs](https://github.com/fincs)**, **[@WinterMute](https://github.com/WinterMute)** and **[@mtheall](https://github.com/mtheall)**) for providing quality and easy-to-use toolchains with bleeding-edge GCC, and for their continued technical advice
 * **[@Nanquitas](https://github.com/Nanquitas)** for the initial version of the game plugin loader code as well as very useful contributions to the GDB stub
 * **[@piepie62](https://github.com/piepie62)** for the current implementation of the Rosalina cheat engine, **Duckbill** for its original implementation
@@ -109,6 +140,6 @@ Omiiba3DS would not be what it is without the contributions and constructive fee
 * **[@jasondellaluce](https://github.com/jasondellaluce)** for LayeredFS
 * **[@LiquidFenrir](https://github.com/LiquidFenrir)** for the memory viewer inside Rosalina's "Process List"
 * **ChaN** for [FatFs](http://elm-chan.org/fsw/ff/00index_e.html)
-* Everyone who has contributed to the Omiiba3DS repository
-* Everyone who has assisted with troubleshooting end-users
-* Everyone who has provided constructive feedback to Omiiba3DS
+* Everyone who has contributed to the Luma3DS repository over the years
+* Everyone who has assisted Luma3DS end-users
+* Everyone who has provided constructive feedback to Luma3DS
