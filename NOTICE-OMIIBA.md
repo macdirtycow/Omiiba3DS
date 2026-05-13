@@ -20,7 +20,7 @@ This fork is **not** affiliated with, endorsed by, or supported by LumaTeam.
 
 ## Summary of changes vs. upstream Luma3DS
 
-Date of changes: **2026-05-10 / 2026-05-11**.
+Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** (v1.3.1 colours + version bump).
 
 The following modifications were made to the upstream Luma3DS source tree.
 Almost every source file received the rebrand replacements; only the most
@@ -50,7 +50,8 @@ significant functional changes are listed individually.
 
 ### Branding tweaks
 - Bootloader and Rosalina title color (`COLOR_TITLE`) changed from cyan to
-  green.
+  a burnt-orange / amber-brown (`#CC6600`). (v1.3.0 briefly shipped a bright
+  green; this was changed before public adoption.)
 - Rosalina overlay menu retitled `"Cow menu"` (titles like
   `"Rosalina -- System info"` became `"Cow menu -- System info"`). The
   internal sysmodule and C symbols (`rosalina.cxi`, `RosalinaMenu_*`) are
@@ -68,7 +69,7 @@ significant functional changes are listed individually.
 
 ### Versioning
 - `arm9/Makefile` no longer derives the version from upstream Luma git
-  tags. Hardcoded default is `1.3.0`, override with
+  tags. Hardcoded default is `1.3.1`, override with
   `make VERSION_MAJOR=… VERSION_MINOR=… VERSION_BUILD=…`.
 
 ### Buffer fixes related to the longer `/omiiba` prefix

@@ -164,7 +164,7 @@ void omiibaBootSplash(void)
     drawHLine(true, 50, SCREEN_TOP_WIDTH - 50,  85, COLOR_TITLE, '=');
     drawBoldString(true, titleX,  110, COLOR_TITLE, title);
     drawString    (true, subX,    140, COLOR_WHITE, subtitle);
-    drawString    (true, forkX,   158, COLOR_GREEN, fork);
+    drawString    (true, forkX,   158, COLOR_TITLE, fork);
     drawHLine(true, 50, SCREEN_TOP_WIDTH - 50, 175, COLOR_TITLE, '=');
     drawString    (true, hintX,   210, COLOR_WHITE, hint);
 

@@ -73,7 +73,7 @@
 #define SPACING_Y 11
 #define SPACING_X 6
 
-#define COLOR_TITLE RGB565(0x00, 0x3F, 0x00) // Omiiba3DS: bright green (was Rosalina cyan)
+#define COLOR_TITLE RGB565(0x19, 0x19, 0x00) // Omiiba3DS: burnt-orange / amber-brown (#CC6600)
 #define COLOR_WHITE RGB565(0x1F, 0x3F, 0x1F)
 #define COLOR_RED   RGB565(0x1F, 0x00, 0x00)
 #define COLOR_GREEN RGB565(0x00, 0x1F, 0x00)

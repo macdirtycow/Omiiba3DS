@@ -36,7 +36,7 @@
 #define SPACING_Y 10
 #define SPACING_X 8
 
-#define COLOR_TITLE  0x33FF00 // Omiiba3DS: bright green (was Luma3DS cyan)
+#define COLOR_TITLE  0x0066CC // Omiiba3DS: burnt-orange / amber-brown (#CC6600, BGR-packed)
 #define COLOR_WHITE  0xFFFFFF
 #define COLOR_RED    0x0000FF
 #define COLOR_GREEN  0x00FF00

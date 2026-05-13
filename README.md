@@ -42,7 +42,7 @@
 ## Installation and upgrade
 Omiiba3DS requires [boot9strap](https://github.com/SciresM/boot9strap) to run.
 
-Once boot9strap has been installed, simply download the [latest release archive](https://github.com/OmiibaTeam/Omiiba3DS/releases/latest) and extract the archive onto the root of your SD card to "install" or to upgrade Omiiba3DS alongside the [homebrew menu and certs bundle](https://github.com/devkitPro/3ds-hbmenu) shipped with it. Replace existing files and merge existing folders if necessary.
+Once boot9strap has been installed, simply download the [latest release archive](https://github.com/macdirtycow/Omiiba3DS/releases/latest) and extract the archive onto the root of your SD card to "install" or to upgrade Omiiba3DS alongside the [homebrew menu and certs bundle](https://github.com/devkitPro/3ds-hbmenu) shipped with it. Replace existing files and merge existing folders if necessary.
 
 Configuration, layered FS data, plugins, screenshots, and payloads now live under the **`omiiba`** folder on the SD card root (`/omiiba`, or `/rw/omiiba` when booting from CTRNAND without an SD card). On first boot, if that folder is missing but the legacy **`luma`** folder is present, Omiiba3DS **renames `luma` to `omiiba`** so existing setups keep working without manual copying.
 
@@ -64,8 +64,8 @@ Everything in the *Description* section above was already present in upstream Lu
 * Project rebranded from "Luma3DS" / "LumaTeam" to "Omiiba3DS" in user-visible strings, file names and config paths
 * The on-card data folder moved from `/luma` to `/omiiba`, with an automatic one-shot migration on first boot
 * A custom textual coldboot splash screen (existing `splash.bin` / `splashbottom.bin` files keep working)
-* Rosalina overlay menu retitled "Cow menu" with a green title color
-* Hardcoded version `v1.3.x` (no longer derived from upstream Luma git tags)
+* Rosalina overlay menu retitled "Cow menu" with a burnt-orange / amber-brown title color (`#CC6600`)
+* Hardcoded version `v1.3.1` (no longer derived from upstream Luma git tags)
 * A few helper build scripts under `scripts/`
 
 For the full per-file change list, see [`NOTICE-OMIIBA.md`](NOTICE-OMIIBA.md).
