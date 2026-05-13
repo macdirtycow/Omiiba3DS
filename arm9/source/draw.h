@@ -43,6 +43,11 @@
 #define COLOR_BLACK  0x000000
 #define COLOR_YELLOW 0x00FFFF
 
+/* Cold-boot splash: dark theme (24-bit BGR same packing as COLOR_WHITE) */
+#define COLOR_SPLASH_BG     0x0A0A10
+#define COLOR_SPLASH_PANEL  0x1C1C24
+#define COLOR_SPLASH_MUTED  0xB8B8C0
+
 #define DRAW_MAX_FORMATTED_STRING_SIZE  512
 
 bool loadSplash(void);

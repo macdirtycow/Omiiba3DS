@@ -20,7 +20,7 @@ This fork is **not** affiliated with, endorsed by, or supported by LumaTeam.
 
 ## Summary of changes vs. upstream Luma3DS
 
-Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** (v1.3.1 colours + version bump).
+Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, **v1.3.4** splash readability: logo scale, tip wrap, panel width).
 
 The following modifications were made to the upstream Luma3DS source tree.
 Almost every source file received the rebrand replacements; only the most
@@ -66,10 +66,25 @@ significant functional changes are listed individually.
   cold boots (skips firmlaunch / NTR / button-mash). Existing
   user-supplied `splash.bin` / `splashbottom.bin` continue to work as in
   Luma3DS.
+- Optional one-line user tagline read from `/omiiba/boot_message.txt`
+  (max ~60 chars, first line only) and rendered on the top splash.
+- Rotating "Cow tip" shown on the bottom splash; rotation state is kept in
+  the 1-byte file `/omiiba/.cow_tip_state`. Tip pool is hardcoded in
+  `arm9/source/draw.c::pickCowTip`.
+- Modernised **cold-boot splash** (`arm9/source/draw.c`): dark background,
+  raised panel cards, thin accent bars in the title colour, cleaner
+  typography, a card layout on the bottom screen, **2× scaled** main title
+  (`OMIIBA3DS`) for readability, lighter muted body text, shortened tips so
+  they fit the card, automatic two-line wrap for edge cases, and a slightly
+  wider bottom panel so text stays inside the frame.
+- `arm9/source/main.c`: **No LCD power-down before `launchFirm()`.** Upstream
+  Luma called `deinitScreens()` here, which blanks the panel until the OS
+  redraws; Omiiba3DS omits that so the last splash frame stays visible
+  (frozen) during FIRM load instead of a long black gap.
 
 ### Versioning
 - `arm9/Makefile` no longer derives the version from upstream Luma git
-  tags. Hardcoded default is `1.3.1`, override with
+  tags. Hardcoded default is `1.3.4`, override with
   `make VERSION_MAJOR=… VERSION_MINOR=… VERSION_BUILD=…`.
 
 ### Buffer fixes related to the longer `/omiiba` prefix

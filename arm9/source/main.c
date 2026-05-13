@@ -400,6 +400,19 @@ boot:
     if(res != 0) error("Failed to apply %u FIRM patch(es).", res);
 
     unmountPartitions();
-    if(bootType != FIRMLAUNCH) deinitScreens();
+    /*
+     * Omiiba3DS: do not call deinitScreens() before launchFirm().
+     *
+     * Upstream Luma powers down the LCD here (backlight + panel bias off) so
+     * the user sees black until NATIVE_FIRM re-initialises the GPU. That
+     * produces a long black gap after our text splash / splash.bin frame.
+     *
+     * Leaving the panel powered keeps the last framebuffer frozen until the
+     * OS takes over — no extra power draw vs. showing black, and firmlaunch
+     * already skipped this path anyway.
+     *
+     * If you ever need the old behaviour (e.g. debugging a GPU transition
+     * glitch), restore: if(bootType != FIRMLAUNCH) deinitScreens();
+     */
     launchFirm(0, NULL);
 }

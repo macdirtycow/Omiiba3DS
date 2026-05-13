@@ -16,7 +16,7 @@ export HBLDR_DEFAULT_3DSX_TID ?= 000400000D921E00
 export HBLDR_DEFAULT_3DSX_TITLE_NAME ?= "hblauncher_loader"
 
 NAME		:=	Omiiba3DS
-REVISION	:=	-v1.3.1
+REVISION	:=	-v1.3.4
 
 SUBFOLDERS	:=	sysmodules arm11 arm9 k11_extension
 
