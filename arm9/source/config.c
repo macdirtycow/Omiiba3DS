@@ -893,6 +893,22 @@ static const char *findGodMode9Payload(void)
     return NULL;
 }
 
+static const char *findOpenAgbFirmPayload(void)
+{
+    static const char *paths[] = {
+        "payloads/open_agb_firm.firm",
+        "payloads/open_agb.firm",
+        "payloads/Open_AGB_Firm.firm",
+        "payloads/OPEN_AGB_FIRM.firm",
+    };
+
+    for(u32 i = 0; i < sizeof(paths) / sizeof(paths[0]); i++)
+        if(getFileSize(paths[i]) > 0)
+            return paths[i];
+
+    return NULL;
+}
+
 static bool directoryExists(const char *path)
 {
     DIR dir;
@@ -1041,6 +1057,110 @@ static void launchGodMode9Tools(void)
     }
 }
 
+static void launchGbaLabs(void)
+{
+    static const char *items[] = {
+        "Start open_agb_firm",
+        "open_agb_firm setup help",
+        "GBA display notes",
+        "AGB_FIRM scaling filters: research",
+        "AGB_FIRM color presets: research",
+        "Back to Boot Hub",
+    };
+
+    static const char *descriptions[] = {
+        "Launch open_agb_firm from /omiiba/payloads.\n\n"
+        "This is the recommended stable path for\n"
+        "SD-card GBA ROM booting.",
+        "Place open_agb_firm at:\n\n"
+        "SD:/omiiba/payloads/open_agb_firm.firm\n\n"
+        "Then reopen this menu and choose\n"
+        "Start open_agb_firm.",
+        "AGB_FIRM VC injects run in legacy GBA mode.\n\n"
+        "Rosalina-style live filters are not expected\n"
+        "to work there without deeper FIRM patches.",
+        "Experimental research only.\n\n"
+        "Omiiba must first find a safe AGB_FIRM\n"
+        "scale/filter patch point before enabling this.",
+        "Experimental research only.\n\n"
+        "Color/gamma changes for VC injects need a\n"
+        "verified AGB_FIRM patch or pre-launch path.",
+        "Return to the Omiiba Boot Hub.",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "GBA Labs");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: Boot Hub");
+        drawString(true, 10, 10 + 2 * SPACING_Y, COLOR_WHITE, "Experimental GBA tools and research");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (4 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE, descriptions[selectedItem]);
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            if(selectedItem == 0)
+            {
+                const char *path = findOpenAgbFirmPayload();
+
+                if(path != NULL)
+                    loadHomebrewFirmPath(path, true);
+
+                drawBootHubMessage("GBA Labs",
+                                   "open_agb_firm was not found.\n\n"
+                                   "Place it at:\n"
+                                   "SD:/omiiba/payloads/open_agb_firm.firm\n\n"
+                                   "Then reopen GBA Labs to launch it.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == itemAmount - 1)
+                return;
+            else
+            {
+                drawBootHubMessage("GBA Labs",
+                                   descriptions[selectedItem]);
+                waitForBootHubBack();
+            }
+        }
+    }
+}
+
 static void showBootHubDiagnostics(void)
 {
     FirmwareSource emuNandType = FIRMWARE_EMUNAND;
@@ -1076,27 +1196,29 @@ static void showBootHubDiagnostics(void)
     drawFormattedString(true, 10, 10 + 5 * SPACING_Y, COLOR_WHITE,
                         "GodMode9: %s", findGodMode9Payload() != NULL ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 6 * SPACING_Y, COLOR_WHITE,
-                        "GM9 save script: %s", getFileSize("sdmc:/gm9/scripts/Omiiba_System_Save_Dump.gm9") > 0 ? "found" : "missing");
+                        "open_agb_firm: %s", findOpenAgbFirmPayload() != NULL ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 7 * SPACING_Y, COLOR_WHITE,
-                        "Payloads: %lu .firm file(s)", countFirmPayloads());
+                        "GM9 save script: %s", getFileSize("sdmc:/gm9/scripts/Omiiba_System_Save_Dump.gm9") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 8 * SPACING_Y, COLOR_WHITE,
-                        "SD boot.firm: %s", getFileSize("sdmc:/boot.firm") > 0 ? "found" : "missing");
+                        "Payloads: %lu .firm file(s)", countFirmPayloads());
     drawFormattedString(true, 10, 10 + 9 * SPACING_Y, COLOR_WHITE,
-                        "CTRNAND boot.firm: %s", getFileSize("nand:/boot.firm") > 0 ? "found" : "missing");
+                        "SD boot.firm: %s", getFileSize("sdmc:/boot.firm") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 10 * SPACING_Y, COLOR_WHITE,
-                        "EmuNAND: %s", emuNandType == FIRMWARE_EMUNAND ? "detected" : "not detected");
+                        "CTRNAND boot.firm: %s", getFileSize("nand:/boot.firm") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 11 * SPACING_Y, COLOR_WHITE,
-                        "Splash: %s", splashMode);
+                        "EmuNAND: %s", emuNandType == FIRMWARE_EMUNAND ? "detected" : "not detected");
     drawFormattedString(true, 10, 10 + 12 * SPACING_Y, COLOR_WHITE,
-                        "Game patching: %s", onOff(CONFIG(PATCHGAMES)));
+                        "Splash: %s", splashMode);
     drawFormattedString(true, 10, 10 + 13 * SPACING_Y, COLOR_WHITE,
+                        "Game patching: %s", onOff(CONFIG(PATCHGAMES)));
+    drawFormattedString(true, 10, 10 + 14 * SPACING_Y, COLOR_WHITE,
                         "Setup wizard: %s", getFileSize(".setup_wizard_done") > 0 ? "done" : "not done");
 
-    drawFormattedString(true, 10, 10 + 15 * SPACING_Y, COLOR_WHITE,
+    drawFormattedString(true, 10, 10 + 16 * SPACING_Y, COLOR_WHITE,
                         "Folders: cheats %s  plugins %s",
                         directoryExists("cheats") ? "ok" : "missing",
                         directoryExists("plugins") ? "ok" : "missing");
-    drawFormattedString(true, 10, 10 + 16 * SPACING_Y, COLOR_WHITE,
+    drawFormattedString(true, 10, 10 + 17 * SPACING_Y, COLOR_WHITE,
                         "         payloads %s  screenshots %s",
                         directoryExists("payloads") ? "ok" : "missing",
                         directoryExists("screenshots") ? "ok" : "missing");
@@ -1616,6 +1738,7 @@ static BootHubResult omiibaBootHub(void)
         "Setup wizard",
         "Boot chainloader",
         "GodMode9 tools",
+        "GBA Labs",
         "Diagnostics",
         "Profiles",
         "Payload manager",
@@ -1632,6 +1755,7 @@ static BootHubResult omiibaBootHub(void)
         "Run a guided first setup for splash,\nbrightness, game patching and GodMode9.",
         "Open the standard payload chainloader.\n\nEquivalent to holding START at boot.",
         "Launch GodMode9 from /omiiba/payloads.\n\nLow-level dumping remains delegated to GodMode9.",
+        "Launch open_agb_firm and view experimental\nGBA display research notes.",
         "Show safe read-only checks for Omiiba setup health.",
         "Apply named safe setting groups:\nDefault, Safe, Performance, Modding, Dev.",
         "List payloads, launch selected .firm files\nand create safe hotkey copies.",
@@ -1701,14 +1825,17 @@ static BootHubResult omiibaBootHub(void)
                     launchGodMode9Tools();
                     break;
                 case 5:
-                    showBootHubDiagnostics();
+                    launchGbaLabs();
                     break;
                 case 6:
-                    return BOOT_HUB_RUN_PROFILES;
+                    showBootHubDiagnostics();
+                    break;
                 case 7:
+                    return BOOT_HUB_RUN_PROFILES;
+                case 8:
                     runPayloadManager();
                     break;
-                case 8:
+                case 9:
                     runThemeSettings();
                     break;
                 default:

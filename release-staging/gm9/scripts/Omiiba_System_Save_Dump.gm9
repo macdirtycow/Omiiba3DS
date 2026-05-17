@@ -1,0 +1,19 @@
+# Omiiba3DS - System Save Dump
+# Copies SysNAND system save data to SD:/gm9/out.
+# This script is read-only for NAND: it only creates folders on SD and copies
+# data out of 1:/data/$[SYSID0]/sysdata.
+
+set OUTDIR $[GM9OUT]/Omiiba_System_Save_Dump_$[DATESTAMP]_$[TIMESTAMP]
+
+echo "Omiiba3DS System Save Dump"
+echo "Output:"
+echo "$[OUTDIR]"
+echo "This copies system save data from SysNAND CTRNAND to SD."
+ask "Continue?"
+
+mkdir $[OUTDIR]
+cp 1:/data/$[SYSID0]/sysdata $[OUTDIR]/sysdata
+
+echo "Done."
+echo "Dump saved to:"
+echo "$[OUTDIR]"

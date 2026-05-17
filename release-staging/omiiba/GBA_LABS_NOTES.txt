@@ -1,0 +1,44 @@
+Omiiba3DS GBA Labs notes
+========================
+
+Stable path: open_agb_firm
+--------------------------
+
+The Omiiba3DS release zip bundles the official open_agb_firm payload here:
+
+  SD:/omiiba/payloads/open_agb_firm.firm
+
+It also bundles open_agb_firm's GBA database here:
+
+  SD:/3ds/open_agb_firm/gba_db.bin
+
+Then boot while holding SELECT and open:
+
+  Omiiba Boot Hub -> GBA Labs -> Start open_agb_firm
+
+Omiiba3DS only launches the payload. GBA ROM selection, save handling,
+gamma/color behavior and open_agb_firm features are handled by open_agb_firm.
+Credits, licenses and source links are included in:
+
+  SD:/THIRD_PARTY/open_agb_firm/
+
+AGB_FIRM research status
+------------------------
+
+Virtual Console GBA injects use Nintendo's AGB_FIRM legacy mode. In that mode,
+the normal 3DS system environment is not available in the same way as NATIVE_FIRM,
+so Rosalina-style live screen filters should not be expected to work during
+GBA gameplay.
+
+Current Omiiba3DS research findings:
+
+- TWL_FIRM has an existing TwlBg upscaling filter replacement path.
+- AGB_FIRM currently only has a known boot-splash patch in this codebase.
+- Scaling/filter changes for VC injects need a verified AGB_FIRM display-driver
+  patch point before they can be safely exposed as real features.
+- Color/gamma presets for VC injects need the same kind of verified pre-launch
+  or FIRM-level patch path.
+
+For now, the GBA Labs scaling and color entries are intentionally marked as
+research. They document the direction without pretending the experimental
+patches are already stable.
