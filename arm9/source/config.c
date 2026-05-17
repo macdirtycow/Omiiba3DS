@@ -1134,9 +1134,9 @@ static const OpenAgbDisplayPreset openAgbDisplayPresets[] = {
         "matrix", "none", "1.0", "0.0", "1.0", 36, false,
     },
     {
-        "Reset open_agb_firm config",
-        "Reset to open_agb_firm-style safe defaults.\n\n"
-        "Good fallback if a preset looks wrong.",
+        "Restore safe default config",
+        "Write a complete safe config.ini.\n\n"
+        "This does not delete or empty the file.",
         "matrix", "none", "1.0", "0.0", "1.0", 64, false,
     },
 };

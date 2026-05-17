@@ -11,7 +11,8 @@ This release turns GBA Labs into a practical display preset manager for the bund
 This is an **alpha / pre-release** build. The Omiiba3DS GBA Labs integration itself does not write to NAND and is not expected to brick a console by itself, but it has not been broadly hardware-tested. It writes only the SD-card file `SD:/3ds/open_agb_firm/config.ini` when applying display presets, and it launches a third-party bare-metal GBA payload (`open_agb_firm`). Use only if you understand normal custom-firmware recovery steps and keep a known-good `boot.firm` backup available.
 
 - **GBA display presets:** `Omiiba Boot Hub -> GBA Labs -> Display presets` can write open_agb_firm scaler/color/backlight presets to `SD:/3ds/open_agb_firm/config.ini`.
-- **Preset choices:** includes Original 1:1, Balanced matrix, Soft bilinear, GBA color, SP101 bright, Vivid emulator, Battery saver and Reset open_agb_firm config.
+- **Preset choices:** includes Original 1:1, Balanced matrix, Soft bilinear, GBA color, SP101 bright, Vivid emulator, Battery saver and Restore safe default config.
+- **Safe restore behavior:** the restore option writes a complete conservative `config.ini`; it never deletes or empties the file.
 - **Safety prompts:** brighter/heavier color presets warn about battery impact before writing.
 - **Bundled open_agb_firm:** the official unmodified `profi200/open_agb_firm` payload remains included at `SD:/omiiba/payloads/open_agb_firm.firm`, with its GBA database at `SD:/3ds/open_agb_firm/gba_db.bin`.
 - **Diagnostics:** the Boot Hub diagnostics screen now checks `open_agb_firm`, `gba_db.bin` and `open_agb_firm/config.ini`.

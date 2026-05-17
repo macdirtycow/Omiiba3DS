@@ -33,10 +33,12 @@ Available presets:
 - SP101 bright: brighter AGS-101-style profile.
 - Vivid emulator: more saturated VBA-style profile.
 - Battery saver: lower backlight and no color processing.
-- Reset open_agb_firm config: conservative fallback defaults.
+- Restore safe default config: writes a complete conservative config.ini.
 
-The preset writer only changes SD:/3ds/open_agb_firm/config.ini. GBA ROM
-selection, save handling and gameplay remain open_agb_firm features.
+The preset writer only changes SD:/3ds/open_agb_firm/config.ini. It never
+deletes or empties that file; the restore option writes a complete safe default
+structure. GBA ROM selection, save handling and gameplay remain open_agb_firm
+features.
 Credits, licenses and source links are included in:
 
   SD:/THIRD_PARTY/open_agb_firm/
