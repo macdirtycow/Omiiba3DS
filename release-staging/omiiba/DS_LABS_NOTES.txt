@@ -1,11 +1,22 @@
 Omiiba3DS DS Labs notes
 =======================
 
-Stable path: TWiLight Menu++ / nds-bootstrap
---------------------------------------------
+Bundled path: TWiLight Menu++ / nds-bootstrap
+---------------------------------------------
 
-Omiiba3DS does not bundle a DS ROM loader. For DS games from SD, use the
-community-standard TWiLight Menu++ and nds-bootstrap stack.
+Omiiba3DS bundles the official TWiLight Menu++ 3DS release for convenience.
+For DS games from SD, use the community-standard TWiLight Menu++ and
+nds-bootstrap stack.
+
+Bundled files:
+
+  SD:/TWiLight Menu.cia
+  SD:/BOOT.NDS
+  SD:/_nds/
+  SD:/roms/
+
+Install SD:/TWiLight Menu.cia with FBI or your preferred title installer to
+launch TWiLight Menu++ from HOME Menu.
 
 Recommended DS ROM folder:
 
@@ -13,6 +24,8 @@ Recommended DS ROM folder:
 
 Common TWiLight/nds-bootstrap paths checked by Omiiba diagnostics:
 
+  SD:/TWiLight Menu.cia
+  SD:/BOOT.NDS
   SD:/_nds/
   SD:/_nds/TWiLightMenu/
   SD:/_nds/nds-bootstrap-release.nds
@@ -34,4 +47,6 @@ documents this path; it does not generate custom filter binaries yet.
 Safety
 ------
 
-DS Labs diagnostics are read-only. They do not write to NAND or SD.
+DS Labs diagnostics are read-only. The "Create DS folders" option only creates
+or verifies SD:/roms/ and SD:/roms/nds/. Installing the bundled CIA is a
+separate user action performed in FBI or another title installer.

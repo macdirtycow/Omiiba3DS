@@ -1,0 +1,23 @@
+TWiLight Menu++ bundle notice
+=============================
+
+Omiiba3DS includes TWiLight Menu++ for convenience as an unmodified third-party
+DS frontend package.
+
+Project: TWiLight Menu++
+Author/upstream: DS-Homebrew, RocketRobz and contributors
+Source: https://github.com/DS-Homebrew/TWiLightMenu
+Bundled release: v27.23.0
+Bundled asset: TWiLightMenu-3DS.7z
+License: GNU GPLv3
+
+Files installed by the Omiiba3DS release zip include:
+
+- SD:/_nds/
+- SD:/BOOT.NDS
+- SD:/TWiLight Menu.cia
+- SD:/roms/
+
+Install the CIA with FBI or your preferred title installer to launch
+TWiLight Menu++ from HOME Menu. Omiiba3DS does not claim authorship of
+TWiLight Menu++.

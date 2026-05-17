@@ -132,9 +132,13 @@ significant functional changes are listed individually.
   `/3ds/open_agb_firm/gba_db.bin`. License files, upstream README, source link
   and bundle notice are shipped under `THIRD_PARTY/open_agb_firm/`.
 - **DS Labs** (`arm9/source/config.c`): the Boot Hub now includes a read-only
-  DS Labs menu for TWiLight Menu++ / nds-bootstrap setup guidance. It checks
-  recommended DS ROM and TWiLight paths, optional cheat database placement, and
-  the existing TWL external filter file `/omiiba/twl_upscaling_filter.bin`.
+  DS Labs menu for the bundled TWiLight Menu++ / nds-bootstrap setup. It checks
+  recommended DS ROM, bundled CIA, `BOOT.NDS`, `_nds`, optional cheat database,
+  and existing TWL external filter paths, and can create `SD:/roms/nds/`.
+- **Bundled TWiLight Menu++** (`release-staging/`): Omiiba3DS ships the
+  official TWiLight Menu++ v27.23.0 3DS package and bundled nds-bootstrap
+  v2.15.0. License files, upstream READMEs, source links and bundle notices are
+  shipped under `THIRD_PARTY/TWiLightMenu/` and `THIRD_PARTY/nds-bootstrap/`.
 - `arm9/source/main.c`: **No LCD power-down before `launchFirm()`.** Upstream
   Luma called `deinitScreens()` here, which blanks the panel until the OS
   redraws; Omiiba3DS omits that so the last splash frame stays visible

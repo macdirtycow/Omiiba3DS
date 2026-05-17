@@ -33,7 +33,10 @@ Omiiba Boot Hub -> GBA Labs -> Display presets
 Preset settings are written to:
 SD:/3ds/open_agb_firm/config.ini
 
-For DS games, install TWiLight Menu++ / nds-bootstrap separately.
+For DS games, the release zip includes TWiLight Menu++ / nds-bootstrap.
+Install this CIA with FBI:
+SD:/TWiLight Menu.cia
+
 Recommended DS ROM folder:
 SD:/roms/nds/
 

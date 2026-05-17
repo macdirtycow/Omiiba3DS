@@ -1,0 +1,34 @@
+<svg width="960" height="960" viewBox="0 0 960 960" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Omiiba wordmark</title>
+  <desc id="desc">A warm brown and orange Omiiba wordmark logo.</desc>
+  <rect width="960" height="960" rx="220" fill="#120a06"/>
+  <rect x="54" y="54" width="852" height="852" rx="190" fill="url(#bg)"/>
+  <path d="M172 640H788" stroke="#cc6600" stroke-width="28" stroke-linecap="round"/>
+  <path d="M218 688H742" stroke="#fff0d0" stroke-width="14" stroke-linecap="round" opacity=".82"/>
+  <g filter="url(#shadow)">
+    <path d="M172 350C172 258 237 197 329 197C421 197 486 258 486 350C486 442 421 503 329 503C237 503 172 442 172 350ZM250 350C250 397 282 429 329 429C376 429 408 397 408 350C408 303 376 271 329 271C282 271 250 303 250 350Z" fill="url(#letters)"/>
+    <path d="M520 209H599L660 333L721 209H800V491H724V341L677 436H643L596 341V491H520V209Z" fill="url(#letters)"/>
+    <path d="M188 558H268V612H188V558Z" fill="#fff0d0"/>
+    <path d="M302 558H382V612H302V558Z" fill="#ff8a1d"/>
+    <path d="M416 558H496V612H416V558Z" fill="#fff0d0"/>
+    <path d="M530 558H610V612H530V558Z" fill="#ff8a1d"/>
+    <path d="M644 558H724V612H644V558Z" fill="#fff0d0"/>
+  </g>
+  <text x="480" y="770" text-anchor="middle" fill="#fff0d0" font-family="Arial Black, Arial, sans-serif" font-size="92" font-weight="900" letter-spacing="8">OMIIBA</text>
+  <text x="480" y="830" text-anchor="middle" fill="#c8aa8c" font-family="Arial, sans-serif" font-size="32" font-weight="700" letter-spacing="10">3DS CUSTOM FIRMWARE</text>
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(480 420) rotate(90) scale(520)">
+      <stop stop-color="#8a4b24"/>
+      <stop offset=".54" stop-color="#2b1810"/>
+      <stop offset="1" stop-color="#160d08"/>
+    </radialGradient>
+    <linearGradient id="letters" x1="172" y1="197" x2="800" y2="503" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff0d0"/>
+      <stop offset=".42" stop-color="#ff8a1d"/>
+      <stop offset="1" stop-color="#fff0d0"/>
+    </linearGradient>
+    <filter id="shadow" x="112" y="157" width="748" height="515" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="28" stdDeviation="22" flood-color="#000000" flood-opacity=".4"/>
+    </filter>
+  </defs>
+</svg>

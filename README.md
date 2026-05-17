@@ -57,7 +57,7 @@ The Hub groups Omiiba-specific shortcuts such as GodMode9 tools, GBA Labs, DS La
 
 **GBA Labs / open_agb_firm workflow:** the release zip bundles the official `open_agb_firm` payload at `/omiiba/payloads/open_agb_firm.firm` and its GBA database at `/3ds/open_agb_firm/gba_db.bin`. Open <kbd>Select</kbd> at boot → **Omiiba Boot Hub** → **GBA Labs** → **Display presets** to write `/3ds/open_agb_firm/config.ini` with scaler, color, brightness and battery presets, then choose **Start open_agb_firm**. This is the stable GBA improvement path for now: it launches open_agb_firm directly for SD-card GBA ROM use. The AGB_FIRM scaling and color entries in GBA Labs are intentionally labelled research because Virtual Console GBA injects run in legacy AGB_FIRM mode, where Rosalina-style live filters are not available without deeper FIRM/display-driver patching.
 
-**DS Labs / TWiLight workflow:** for DS games from SD, install TWiLight Menu++ and nds-bootstrap separately, place DS ROMs in the recommended `SD:/roms/nds/` folder, then use **Omiiba Boot Hub** → **DS Labs** to check common setup paths. DS Labs is read-only and also documents the existing TWL external filter hook using `/omiiba/twl_upscaling_filter.bin`.
+**DS Labs / TWiLight workflow:** the release zip bundles the official TWiLight Menu++ 3DS package (`TWiLight Menu.cia`, `BOOT.NDS`, `_nds`, and `roms`). Install `SD:/TWiLight Menu.cia` with FBI, place DS ROMs in the recommended `SD:/roms/nds/` folder, then use **Omiiba Boot Hub** → **DS Labs** to check common setup paths or create the DS ROM folders. DS Labs also documents the existing TWL external filter hook using `/omiiba/twl_upscaling_filter.bin`.
 
 **The chainloader menu** is accessed by pressing <kbd>Start</kbd> at boot, or from the configuration menu. Payloads are expected to be located in `/omiiba/payloads` with the `.firm` extension; if there is only one such payload, the aforementionned selection menu will be skipped. Hotkeys can be assigned to payload, for example `x_test.firm` will be chainloaded when <kbd>X</kbd> is pressed at boot.
 
@@ -86,7 +86,7 @@ Everything in the *Description* section above was already present in upstream Lu
 * **Payload Manager:** lists and launches `.firm` payloads, explains hotkey naming, and can copy payloads to hotkey-prefixed filenames without destructive renames
 * **Theme/settings:** built-in boot splash palettes stored in `/omiiba/.boot_theme`, custom `boot_message.txt` help, and Cow tip rotation reset
 * **GBA Labs:** experimental Boot Hub area with a stable `open_agb_firm` launcher, SD-only display preset writer for `/3ds/open_agb_firm/config.ini`, and honest research notes for future AGB_FIRM scaling/filter and color-preset work
-* **DS Labs:** read-only TWiLight Menu++ / nds-bootstrap setup checks, recommended `SD:/roms/nds/` guidance and TWL external filter help
+* **DS Labs:** bundled TWiLight Menu++ / nds-bootstrap setup checks, `SD:/TWiLight Menu.cia` install guidance, recommended `SD:/roms/nds/` folder creation and TWL external filter help
 * A few helper build scripts under `scripts/`
 
 For the full per-file change list, see [`NOTICE-OMIIBA.md`](NOTICE-OMIIBA.md).

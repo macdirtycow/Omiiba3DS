@@ -1,0 +1,14 @@
+nds-bootstrap bundle notice
+===========================
+
+Omiiba3DS includes nds-bootstrap as part of the bundled TWiLight Menu++ 3DS
+release package.
+
+Project: nds-bootstrap
+Author/upstream: DS-Homebrew, RocketRobz and contributors
+Source: https://github.com/DS-Homebrew/nds-bootstrap
+Bundled release: v2.15.0, included in TWiLight Menu++ v27.23.0
+License: GNU GPLv3
+
+Omiiba3DS does not claim authorship of nds-bootstrap. DS Labs only checks the
+installed files and documents the recommended setup paths.

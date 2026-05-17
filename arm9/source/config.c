@@ -1403,7 +1403,8 @@ static void launchDsLabs(void)
 {
     static const char *items[] = {
         "DS setup status",
-        "TWiLight Menu++ help",
+        "Create DS folders",
+        "Bundled TWiLight help",
         "TWL filter help",
         "DS ROM folder notes",
         "Back to Boot Hub",
@@ -1412,10 +1413,16 @@ static void launchDsLabs(void)
     static const char *descriptions[] = {
         "Check common DS/TWiLight folders and files.\n\n"
         "This is read-only and does not change SD.",
-        "Recommended DS SD-card stack:\n\n"
-        "TWiLight Menu++ + nds-bootstrap.\n\n"
-        "Install it separately, then put DS ROMs in\n"
-        "SD:/roms/nds/.",
+        "Create recommended DS folders on SD:\n\n"
+        "SD:/roms/\n"
+        "SD:/roms/nds/\n\n"
+        "This does not install the TWiLight CIA.",
+        "The release zip bundles TWiLight Menu++:\n\n"
+        "SD:/TWiLight Menu.cia\n"
+        "SD:/BOOT.NDS\n"
+        "SD:/_nds/\n\n"
+        "Install the CIA with FBI, then put DS ROMs\n"
+        "in SD:/roms/nds/.",
         "Omiiba can patch TWL_FIRM's upscaling filter\n"
         "when Advanced setting Enable DSi external\n"
         "filter is on and this file exists:\n\n"
@@ -1483,26 +1490,41 @@ static void launchDsLabs(void)
                 drawFormattedString(true, 10, 10 + 3 * SPACING_Y, COLOR_WHITE,
                                     "DS ROM folder: %s", directoryExists("sdmc:/roms/nds") ? "found" : "missing");
                 drawFormattedString(true, 10, 10 + 4 * SPACING_Y, COLOR_WHITE,
-                                    "TWiLight _nds: %s", directoryExists("sdmc:/_nds") ? "found" : "missing");
+                                    "TWiLight CIA: %s", getFileSize("sdmc:/TWiLight Menu.cia") > 0 ? "found" : "missing");
                 drawFormattedString(true, 10, 10 + 5 * SPACING_Y, COLOR_WHITE,
-                                    "TWiLightMenu: %s", directoryExists("sdmc:/_nds/TWiLightMenu") ? "found" : "missing");
+                                    "BOOT.NDS: %s", getFileSize("sdmc:/BOOT.NDS") > 0 ? "found" : "missing");
                 drawFormattedString(true, 10, 10 + 6 * SPACING_Y, COLOR_WHITE,
+                                    "TWiLight _nds: %s", directoryExists("sdmc:/_nds") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 7 * SPACING_Y, COLOR_WHITE,
+                                    "TWiLightMenu: %s", directoryExists("sdmc:/_nds/TWiLightMenu") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 8 * SPACING_Y, COLOR_WHITE,
                                     "nds-bootstrap: %s",
                                     getFileSize("sdmc:/_nds/nds-bootstrap-release.nds") > 0 ||
                                     getFileSize("sdmc:/_nds/nds-bootstrap.nds") > 0 ? "found" : "missing");
-                drawFormattedString(true, 10, 10 + 7 * SPACING_Y, COLOR_WHITE,
-                                    "Cheat DB: %s", getFileSize("sdmc:/_nds/TWiLightMenu/extras/usrcheat.dat") > 0 ? "found" : "missing");
-                drawFormattedString(true, 10, 10 + 8 * SPACING_Y, COLOR_WHITE,
-                                    "TWL filter bin: %s", getFileSize("twl_upscaling_filter.bin") > 0 ? "found" : "missing");
                 drawFormattedString(true, 10, 10 + 9 * SPACING_Y, COLOR_WHITE,
+                                    "Cheat DB: %s", getFileSize("sdmc:/_nds/TWiLightMenu/extras/usrcheat.dat") > 0 ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 10 * SPACING_Y, COLOR_WHITE,
+                                    "TWL filter bin: %s", getFileSize("twl_upscaling_filter.bin") > 0 ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 11 * SPACING_Y, COLOR_WHITE,
                                     "TWL external filter: %s", onOff(CONFIG(ENABLEDSIEXTFILTER)));
 
                 drawString(false, 10, 10, COLOR_WHITE,
                            "Recommended DS ROM folder:\n"
                            "SD:/roms/nds/\n\n"
-                           "TWiLight Menu++ and nds-bootstrap are\n"
-                           "not bundled by Omiiba3DS.\n\n"
+                           "Install SD:/TWiLight Menu.cia with FBI\n"
+                           "to launch TWiLight from HOME Menu.\n\n"
                            "Press A/B/START to return.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == 1)
+            {
+                f_mkdir("sdmc:/roms");
+                f_mkdir("sdmc:/roms/nds");
+                drawBootHubMessage("DS Labs",
+                                   "Created/checked DS folders:\n\n"
+                                   "SD:/roms/\n"
+                                   "SD:/roms/nds/\n\n"
+                                   "Put .nds ROMs in SD:/roms/nds/.");
                 waitForBootHubBack();
             }
             else if(selectedItem == itemAmount - 1)
@@ -1562,20 +1584,22 @@ static void showBootHubDiagnostics(void)
     drawFormattedString(true, 10, 10 + 10 * SPACING_Y, COLOR_WHITE,
                         "DS ROM folder: %s", directoryExists("sdmc:/roms/nds") ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 11 * SPACING_Y, COLOR_WHITE,
-                        "TWiLight _nds: %s", directoryExists("sdmc:/_nds") ? "found" : "missing");
+                        "TWiLight CIA: %s", getFileSize("sdmc:/TWiLight Menu.cia") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 12 * SPACING_Y, COLOR_WHITE,
-                        "TWL filter bin: %s", getFileSize("twl_upscaling_filter.bin") > 0 ? "found" : "missing");
+                        "TWiLight _nds: %s", directoryExists("sdmc:/_nds") ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 13 * SPACING_Y, COLOR_WHITE,
-                        "GM9 save script: %s", getFileSize("sdmc:/gm9/scripts/Omiiba_System_Save_Dump.gm9") > 0 ? "found" : "missing");
+                        "TWL filter bin: %s", getFileSize("twl_upscaling_filter.bin") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 14 * SPACING_Y, COLOR_WHITE,
-                        "Payloads: %lu .firm file(s)", countFirmPayloads());
+                        "GM9 save script: %s", getFileSize("sdmc:/gm9/scripts/Omiiba_System_Save_Dump.gm9") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 15 * SPACING_Y, COLOR_WHITE,
-                        "SD boot.firm: %s", getFileSize("sdmc:/boot.firm") > 0 ? "found" : "missing");
+                        "Payloads: %lu .firm file(s)", countFirmPayloads());
     drawFormattedString(true, 10, 10 + 16 * SPACING_Y, COLOR_WHITE,
-                        "CTRNAND boot.firm: %s", getFileSize("nand:/boot.firm") > 0 ? "found" : "missing");
+                        "SD boot.firm: %s", getFileSize("sdmc:/boot.firm") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 17 * SPACING_Y, COLOR_WHITE,
-                        "EmuNAND: %s", emuNandType == FIRMWARE_EMUNAND ? "detected" : "not detected");
+                        "CTRNAND boot.firm: %s", getFileSize("nand:/boot.firm") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 18 * SPACING_Y, COLOR_WHITE,
+                        "EmuNAND: %s", emuNandType == FIRMWARE_EMUNAND ? "detected" : "not detected");
+    drawFormattedString(true, 10, 10 + 19 * SPACING_Y, COLOR_WHITE,
                         "Splash: %s", splashMode);
 
     drawString(false, 10, 10, COLOR_WHITE,

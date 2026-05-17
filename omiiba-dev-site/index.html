@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Omiiba3DS - A friendlier 3DS boot experience</title>
+  <meta name="description" content="Omiiba3DS is an unofficial educational Luma3DS fork focused on a clearer boot menu, guided setup, diagnostics, GBA Labs, bundled DS Labs, payload tools, and GodMode9 handoff.">
+  <meta property="og:title" content="Omiiba3DS">
+  <meta property="og:description" content="A friendlier Nintendo 3DS boot experience, based on Luma3DS.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://omiiba.dev/">
+  <meta name="theme-color" content="#cc6600">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="/">
+        <img class="brand-mark" src="assets/omiiba-logo.svg" alt="">
+        <span>Omiiba3DS</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#hub">Boot Hub</a>
+        <a href="#install">Install</a>
+        <a href="#release">Release</a>
+        <a href="https://github.com/macdirtycow/Omiiba3DS">GitHub</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Nintendo 3DS custom firmware</p>
+        <div class="hero-logo-lockup">
+          <img src="assets/omiiba-logo.svg" alt="Omiiba3DS logo">
+          <span>A clearer startup flow for modded 3DS systems.</span>
+        </div>
+        <h1>Omiiba3DS</h1>
+        <p class="lead">
+          Omiiba3DS is an unofficial educational fork of Luma3DS focused on the
+          part you see first: booting, configuring, checking, launching tools,
+          and setting up retro handheld workflows from one readable startup hub.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.4.zip">Download v1.4.4 alpha</a>
+          <a class="button secondary" href="https://github.com/macdirtycow/Omiiba3DS/releases/latest">View release</a>
+        </div>
+        <p class="fine-print">
+          Built for users who want the reliability of the Luma3DS base with a
+          more guided Omiiba boot experience. Omiiba3DS is not affiliated with
+          or endorsed by LumaTeam.
+        </p>
+        <div class="hero-stats" aria-label="Project highlights">
+          <div><strong>v1.4.4</strong><span>alpha release</span></div>
+          <div><strong>SELECT</strong><span>opens Boot Hub</span></div>
+          <div><strong>GPLv3</strong><span>source available</span></div>
+        </div>
+      </div>
+
+      <div class="hero-card" aria-label="Omiiba Boot Hub preview">
+        <div class="console-top">
+          <img src="assets/omiiba-logo.svg" alt="">
+          <div>
+            <strong>Omiiba Boot Hub</strong>
+            <span>A warm brown menu style with clear actions and safer tool handoff.</span>
+          </div>
+        </div>
+        <div class="screen">
+          <div class="screen-title">Omiiba Boot Hub</div>
+          <div class="screen-row active">Continue normal boot</div>
+          <div class="screen-row">Save settings and boot</div>
+          <div class="screen-row">Setup wizard</div>
+          <div class="screen-row">GBA Labs</div>
+          <div class="screen-row">DS Labs</div>
+          <div class="screen-row">Diagnostics</div>
+          <div class="screen-row">Payload manager</div>
+          <div class="screen-footer">SELECT at boot</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="identity-strip" aria-label="Omiiba3DS identity">
+      <div>
+        <span class="strip-kicker">Clearer booting</span>
+        <strong>Common actions are placed up front instead of hidden behind old menu habits.</strong>
+      </div>
+      <div>
+        <span class="strip-kicker">Omiiba style</span>
+        <strong>Deep brown panels, orange highlights, cream text, and readable contrast.</strong>
+      </div>
+      <div>
+        <span class="strip-kicker">Safer by design</span>
+        <strong>Advanced NAND and file maintenance is delegated to GodMode9 instead of duplicated.</strong>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="section-heading">
+        <p class="eyebrow">What makes it different</p>
+        <h2>More than a renamed firmware build</h2>
+        <p>
+          Omiiba3DS keeps the trusted Luma3DS foundation, then adds a practical
+          layer for day-to-day use: guided setup, launch shortcuts, readable
+          status checks, GBA display presets, and bundled DS setup help.
+        </p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <h3>Omiiba Boot Hub</h3>
+          <p>Holding SELECT opens Omiiba Boot Hub first. The classic advanced settings stay available, but the main flow is easier to understand.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Setup wizard</h3>
+          <p>A first-run walkthrough for splash behavior, brightness, game patching, external FIRMs/modules, and GodMode9 placement.</p>
+        </article>
+        <article class="feature-card">
+          <h3>GBA Labs</h3>
+          <p>Launch bundled open_agb_firm, write safe display presets, check the GBA database, and keep deeper AGB_FIRM filter work clearly marked as research.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Bundled DS Labs</h3>
+          <p>The release includes TWiLight Menu++ files, checks the setup, creates the recommended DS ROM folder, and points users to the CIA install step.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Payload manager</h3>
+          <p>Launch .firm payloads, check available payloads, view hotkey naming help, and create non-destructive hotkey copies.</p>
+        </article>
+        <article class="feature-card">
+          <h3>GodMode9 handoff</h3>
+          <p>Omiiba does not pretend to replace GodMode9. It gives you clean shortcuts and scripts while keeping risky tools in the right app.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="hub" class="section hub-showcase">
+      <div class="section-heading">
+        <p class="eyebrow">Omiiba Boot Hub</p>
+        <h2>The new front door for your 3DS</h2>
+        <p>
+          The old SELECT configuration screen still exists, but Omiiba Boot Hub
+          now sits in front of it. From there you can boot normally, save changes,
+          launch payloads, run diagnostics, apply profiles, or enter advanced
+          settings when you really need them.
+        </p>
+      </div>
+      <div class="showcase-grid">
+        <article class="showcase-card large">
+          <span class="card-number">01</span>
+          <h3>Fast normal boot</h3>
+          <p>Continue normal boot skips unnecessary config writes when nothing changed, making the hub feel responsive instead of slowing down startup.</p>
+        </article>
+        <article class="showcase-card">
+          <span class="card-number">02</span>
+          <h3>Advanced settings</h3>
+          <p>Power users still get the familiar advanced options, now grouped behind a clearer entry point.</p>
+        </article>
+        <article class="showcase-card">
+          <span class="card-number">03</span>
+          <h3>Release ready</h3>
+          <p>Release packages include the expected folder layout, bundled retro helpers, payload instructions, release notes, and GodMode9 script guidance.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section visual-band">
+      <div>
+        <p class="eyebrow">Menu colors</p>
+        <h2>The website now matches the firmware mood</h2>
+        <p>
+          The visual language follows the boot menu: dark brown panels, warm
+          orange selection accents, cream text, and soft amber glow. The site
+          should feel like Omiiba before the firmware is even downloaded.
+        </p>
+      </div>
+      <div class="palette" aria-label="Omiiba color palette">
+        <span style="--swatch:#130c08">Shell</span>
+        <span style="--swatch:#2b1810">Panel</span>
+        <span style="--swatch:#8a4b24">Brown</span>
+        <span style="--swatch:#cc6600">Accent</span>
+        <span style="--swatch:#fff0d0">Cream</span>
+      </div>
+    </section>
+
+    <section id="install" class="section split">
+      <div>
+        <p class="eyebrow">Install</p>
+        <h2>Install from the release archive</h2>
+        <p>
+          Omiiba3DS is installed like a normal boot.firm based custom firmware
+          release. Download the archive, extract it to the root of the SD card,
+          and merge the included folders when prompted.
+        </p>
+      </div>
+      <ol class="steps">
+        <li>Use a Nintendo 3DS system that already has boot9strap installed.</li>
+        <li>Extract <code>Omiiba3DS-v1.4.4.zip</code> directly to the SD card root.</li>
+        <li>Hold <strong>SELECT</strong> while booting to open Omiiba Boot Hub.</li>
+        <li>For DS games, install <code>SD:/TWiLight Menu.cia</code> with FBI after extraction.</li>
+      </ol>
+    </section>
+
+    <section id="release" class="section release">
+      <div>
+        <p class="eyebrow">Latest release</p>
+        <h2>v1.4.4 alpha</h2>
+        <p>
+          Version 1.4.4 adds GBA display presets for open_agb_firm, keeps deeper
+          AGB_FIRM display work marked as research, and bundles TWiLight Menu++
+          so DS Labs can guide a real DS setup instead of only listing missing
+          files.
+        </p>
+      </div>
+      <a class="button primary" href="https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.4.zip">Download release zip</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Omiiba3DS is GPLv3 software based on Luma3DS. Original work copyright LumaTeam.</p>
+    <p><a href="https://github.com/macdirtycow/Omiiba3DS">Source code</a> / <a href="https://github.com/macdirtycow/Omiiba3DS/releases/latest">Latest release</a></p>
+  </footer>
+</body>
+</html>
