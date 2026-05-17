@@ -27,6 +27,12 @@ Omiiba Boot Hub -> GodMode9 tools
 For GBA SD-card ROM booting, open:
 Omiiba Boot Hub -> GBA Labs -> Start open_agb_firm
 
+For scaler/color/backlight presets, open:
+Omiiba Boot Hub -> GBA Labs -> Display presets
+
+Preset settings are written to:
+SD:/3ds/open_agb_firm/config.ini
+
 For system save dumps, use the release zip's script:
 SD:/gm9/scripts/Omiiba_System_Save_Dump.gm9
 

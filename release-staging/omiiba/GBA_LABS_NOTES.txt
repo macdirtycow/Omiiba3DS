@@ -16,8 +16,27 @@ Then boot while holding SELECT and open:
 
   Omiiba Boot Hub -> GBA Labs -> Start open_agb_firm
 
-Omiiba3DS only launches the payload. GBA ROM selection, save handling,
-gamma/color behavior and open_agb_firm features are handled by open_agb_firm.
+Omiiba3DS launches the payload and can write display presets to:
+
+  SD:/3ds/open_agb_firm/config.ini
+
+The preset menu is here:
+
+  Omiiba Boot Hub -> GBA Labs -> Display presets
+
+Available presets:
+
+- Original 1:1: no scaling, no color correction.
+- Balanced matrix: matrix scaler with the GBA color profile.
+- Soft bilinear: bilinear scaler with SP101-style colors.
+- GBA color: lower saturation/brightness bias for older games.
+- SP101 bright: brighter AGS-101-style profile.
+- Vivid emulator: more saturated VBA-style profile.
+- Battery saver: lower backlight and no color processing.
+- Reset open_agb_firm config: conservative fallback defaults.
+
+The preset writer only changes SD:/3ds/open_agb_firm/config.ini. GBA ROM
+selection, save handling and gameplay remain open_agb_firm features.
 Credits, licenses and source links are included in:
 
   SD:/THIRD_PARTY/open_agb_firm/
@@ -34,6 +53,8 @@ Current Omiiba3DS research findings:
 
 - TWL_FIRM has an existing TwlBg upscaling filter replacement path.
 - AGB_FIRM currently only has a known boot-splash patch in this codebase.
+- The next real VC-inject research step is finding AgbBg/display-driver
+  constants or tables, not trying to apply Rosalina live filters.
 - Scaling/filter changes for VC injects need a verified AGB_FIRM display-driver
   patch point before they can be safely exposed as real features.
 - Color/gamma presets for VC injects need the same kind of verified pre-launch
