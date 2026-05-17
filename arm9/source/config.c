@@ -1588,6 +1588,7 @@ typedef enum
 {
     BOOT_HUB_BACK_TO_SETTINGS = 0,
     BOOT_HUB_CONTINUE_BOOT,
+    BOOT_HUB_SAVE_SETTINGS_BOOT,
     BOOT_HUB_RUN_SETUP_WIZARD,
     BOOT_HUB_RUN_PROFILES,
 } BootHubResult;
@@ -1611,6 +1612,7 @@ static BootHubResult omiibaBootHub(void)
 {
     static const char *items[] = {
         "Continue normal boot",
+        "Save settings and boot",
         "Setup wizard",
         "Boot chainloader",
         "GodMode9 tools",
@@ -1622,7 +1624,11 @@ static BootHubResult omiibaBootHub(void)
     };
 
     static const char *descriptions[] = {
-        "Save current settings and continue booting Omiiba3DS.",
+        "Continue booting Omiiba3DS.\n\n"
+        "If no settings changed, this skips config.ini\n"
+        "writing for a faster exit.",
+        "Write current pending settings to config.ini,\n"
+        "then continue booting Omiiba3DS.",
         "Run a guided first setup for splash,\nbrightness, game patching and GodMode9.",
         "Open the standard payload chainloader.\n\nEquivalent to holding START at boot.",
         "Launch GodMode9 from /omiiba/payloads.\n\nLow-level dumping remains delegated to GodMode9.",
@@ -1684,22 +1690,24 @@ static BootHubResult omiibaBootHub(void)
                 case 0:
                     return BOOT_HUB_CONTINUE_BOOT;
                 case 1:
-                    return BOOT_HUB_RUN_SETUP_WIZARD;
+                    return BOOT_HUB_SAVE_SETTINGS_BOOT;
                 case 2:
+                    return BOOT_HUB_RUN_SETUP_WIZARD;
+                case 3:
                     loadHomebrewFirm(0);
                     break;
-                case 3:
+                case 4:
                     launchGodMode9Tools();
                     break;
-                case 4:
+                case 5:
                     showBootHubDiagnostics();
                     break;
-                case 5:
-                    return BOOT_HUB_RUN_PROFILES;
                 case 6:
+                    return BOOT_HUB_RUN_PROFILES;
+                case 7:
                     runPayloadManager();
                     break;
-                case 7:
+                case 8:
                     runThemeSettings();
                     break;
                 default:
@@ -2100,6 +2108,9 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
         selectedOption = 0,
         singleSelected = 0;
     bool isMultiOption = false;
+    bool settingsDirty = needConfig == CREATE_CONFIGURATION;
+    bool forceSaveAndBoot = false;
+    bool skipConfigWrite = false;
 
     //Parse the existing options
     for(u32 i = 0; i < multiOptionsAmount; i++)
@@ -2116,7 +2127,10 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
         singleOptions[i].enabled = CONFIG(i);
 
     if(needConfig == CREATE_CONFIGURATION && getFileSize(".setup_wizard_done") == 0)
+    {
         runOmiibaSetupWizard(multiOptions, singleOptions);
+        settingsDirty = true;
+    }
 
 drawConfigScreen:
     initScreens();
@@ -2260,6 +2274,7 @@ drawConfigScreen:
                 u32 oldEnabled = multiOptions[selectedOption].enabled;
                 drawCharacter(true, 10 + multiOptions[selectedOption].posXs[oldEnabled] * SPACING_X, multiOptions[selectedOption].posY, COLOR_BLACK, selected);
                 multiOptions[selectedOption].enabled = (oldEnabled == 3 || !multiOptions[selectedOption].posXs[oldEnabled + 1]) ? 0 : oldEnabled + 1;
+                settingsDirty = true;
 
                 if(selectedOption == BRIGHTNESS) updateBrightness(multiOptions[BRIGHTNESS].enabled);
             }
@@ -2269,6 +2284,7 @@ drawConfigScreen:
                 if (singleSelected == singleOptionsAmount - 1)
                 {
                     drawString(true, 10, singleOptions[singleSelected].posY, COLOR_GREEN, singleOptionsText[singleSelected]);
+                    forceSaveAndBoot = true;
                     startPressed = false;
                     break;
                 }
@@ -2282,15 +2298,29 @@ drawConfigScreen:
 
                     if(hubResult == BOOT_HUB_CONTINUE_BOOT)
                     {
+                        skipConfigWrite = !settingsDirty;
+                        startPressed = false;
+                        break;
+                    }
+
+                    if(hubResult == BOOT_HUB_SAVE_SETTINGS_BOOT)
+                    {
+                        forceSaveAndBoot = true;
                         startPressed = false;
                         break;
                     }
 
                     if(hubResult == BOOT_HUB_RUN_SETUP_WIZARD)
+                    {
                         runOmiibaSetupWizard(multiOptions, singleOptions);
+                        settingsDirty = true;
+                    }
 
                     if(hubResult == BOOT_HUB_RUN_PROFILES)
+                    {
                         runOmiibaProfiles(multiOptions, singleOptions);
+                        settingsDirty = true;
+                    }
 
                     goto drawConfigScreen;
                 }
@@ -2298,6 +2328,7 @@ drawConfigScreen:
                 {
                     bool oldEnabled = singleOptions[singleSelected].enabled;
                     singleOptions[singleSelected].enabled = !oldEnabled;
+                    settingsDirty = true;
                     if(oldEnabled) drawCharacter(true, 10 + SPACING_X, singleOptions[singleSelected].posY, COLOR_BLACK, selected);
                 }
             }
@@ -2308,26 +2339,34 @@ drawConfigScreen:
         else if(singleOptions[singleSelected].enabled && singleOptionsText[singleSelected][0] == '(') drawCharacter(true, 10 + SPACING_X, singleOptions[singleSelected].posY, COLOR_RED, selected);
     }
 
-    //Parse and write the new configuration
-    configData.multiConfig = 0;
-    for(u32 i = 0; i < multiOptionsAmount; i++)
-        configData.multiConfig |= multiOptions[i].enabled << (i * 2);
+    bool didSaveConfig = !skipConfigWrite || settingsDirty || forceSaveAndBoot;
 
-    configData.config &= ~((1 << (u32)NUMCONFIGURABLE) - 1);
-    for(u32 i = 0; i < singleOptionsAmount; i++)
-        configData.config |= (singleOptions[i].enabled ? 1 : 0) << i;
-
-    writeConfig(true);
-
-    u32 newPinMode = MULTICONFIG(PIN);
-
-    if(newPinMode != 0) newPin(oldPinStatus && newPinMode == oldPinMode, newPinMode);
-    else if(oldPinStatus)
+    if(didSaveConfig)
     {
-        if(!fileDelete(PIN_FILE))
-            error("Unable to delete PIN file");
+        //Parse and write the new configuration
+        configData.multiConfig = 0;
+        for(u32 i = 0; i < multiOptionsAmount; i++)
+            configData.multiConfig |= multiOptions[i].enabled << (i * 2);
+
+        configData.config &= ~((1 << (u32)NUMCONFIGURABLE) - 1);
+        for(u32 i = 0; i < singleOptionsAmount; i++)
+            configData.config |= (singleOptions[i].enabled ? 1 : 0) << i;
+
+        writeConfig(true);
+
+        u32 newPinMode = MULTICONFIG(PIN);
+
+        if(newPinMode != 0) newPin(oldPinStatus && newPinMode == oldPinMode, newPinMode);
+        else if(oldPinStatus)
+        {
+            if(!fileDelete(PIN_FILE))
+                error("Unable to delete PIN file");
+        }
     }
 
-    while(HID_PAD & PIN_BUTTONS);
-    wait(2000ULL);
+    if(didSaveConfig)
+    {
+        while(HID_PAD & PIN_BUTTONS);
+        wait(2000ULL);
+    }
 }

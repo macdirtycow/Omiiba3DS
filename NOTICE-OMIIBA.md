@@ -20,7 +20,7 @@ This fork is **not** affiliated with, endorsed by, or supported by LumaTeam.
 
 ## Summary of changes vs. upstream Luma3DS
 
-Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, v1.3.4 splash readability, **v1.4.0** Omiiba Boot Hub).
+Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, v1.3.4 splash readability, v1.4.0 Omiiba Boot Hub, **v1.4.1** fast Boot Hub exit).
 
 The following modifications were made to the upstream Luma3DS source tree.
 Almost every source file received the rebrand replacements; only the most
@@ -82,6 +82,8 @@ significant functional changes are listed individually.
   includes normal boot, chainloader, GodMode9 tools, diagnostics, profiles,
   payload manager and theme/settings entries. Low-level maintenance remains a
   GodMode9 handoff rather than native NAND/key/injection tooling in Omiiba.
+  The Hub distinguishes fast `Continue normal boot` (skips config writes when
+  no settings changed) from explicit `Save settings and boot`.
 - **GodMode9 system save dump handoff**: the release skeleton includes
   `gm9/scripts/Omiiba_System_Save_Dump.gm9`, a read-only dump script that
   copies SysNAND system save data from `1:/data/$[SYSID0]/sysdata` to
@@ -119,7 +121,7 @@ significant functional changes are listed individually.
 
 ### Versioning
 - `arm9/Makefile` no longer derives the version from upstream Luma git
-  tags. Hardcoded default is `1.4.0`, override with
+  tags. Hardcoded default is `1.4.1`, override with
   `make VERSION_MAJOR=… VERSION_MINOR=… VERSION_BUILD=…`.
 
 ### Buffer fixes related to the longer `/omiiba` prefix
