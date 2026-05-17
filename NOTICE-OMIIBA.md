@@ -20,7 +20,7 @@ This fork is **not** affiliated with, endorsed by, or supported by LumaTeam.
 
 ## Summary of changes vs. upstream Luma3DS
 
-Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, v1.3.4 splash readability, v1.4.0 Omiiba Boot Hub, **v1.4.1** fast Boot Hub exit).
+Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, v1.3.4 splash readability, v1.4.0 Omiiba Boot Hub, v1.4.1 fast Boot Hub exit, **v1.4.2** Hub-first polish).
 
 The following modifications were made to the upstream Luma3DS source tree.
 Almost every source file received the rebrand replacements; only the most
@@ -78,7 +78,9 @@ significant functional changes are listed individually.
   they fit the card, automatic two-line wrap for edge cases, and a slightly
   wider bottom panel so text stays inside the frame.
 - **Omiiba Boot Hub** (`arm9/source/config.c`): a new entry in the boot
-  configuration menu that groups Omiiba-specific shortcuts. The first version
+  flow that replaces SELECT's first screen and groups Omiiba-specific shortcuts.
+  The classic Luma/Omiiba configuration menu remains available as
+  `Advanced boot settings`. The first version
   includes normal boot, chainloader, GodMode9 tools, diagnostics, profiles,
   payload manager and theme/settings entries. Low-level maintenance remains a
   GodMode9 handoff rather than native NAND/key/injection tooling in Omiiba.
@@ -91,8 +93,9 @@ significant functional changes are listed individually.
   it does not perform NAND writes or key/title decryption.
 - **Setup wizard** (`arm9/source/config.c`): a guided first-boot / on-demand
   flow for safe Omiiba defaults. It can enable splash-before-payloads, set a
-  bright boot-menu brightness level, enable game patching, and explain GodMode9
-  placement. Completion is tracked
+  bright boot-menu brightness level, enable game patching, optionally enable
+  external FIRMs/modules, and explain GodMode9 placement. Wizard choices update
+  the same pending settings displayed by `Advanced boot settings`. Completion is tracked
   with `/omiiba/.setup_wizard_done`.
 - **Read-only diagnostics** (`arm9/source/config.c`): Boot Hub diagnostics now
   check config presence, GodMode9 payload presence, the bundled GM9 system-save
@@ -121,7 +124,7 @@ significant functional changes are listed individually.
 
 ### Versioning
 - `arm9/Makefile` no longer derives the version from upstream Luma git
-  tags. Hardcoded default is `1.4.1`, override with
+  tags. Hardcoded default is `1.4.2`, override with
   `make VERSION_MAJOR=… VERSION_MINOR=… VERSION_BUILD=…`.
 
 ### Buffer fixes related to the longer `/omiiba` prefix

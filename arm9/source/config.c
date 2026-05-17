@@ -1620,7 +1620,7 @@ static BootHubResult omiibaBootHub(void)
         "Profiles",
         "Payload manager",
         "Theme/settings",
-        "Back to boot settings",
+        "Advanced boot settings",
     };
 
     static const char *descriptions[] = {
@@ -1636,7 +1636,8 @@ static BootHubResult omiibaBootHub(void)
         "Apply named safe setting groups:\nDefault, Safe, Performance, Modding, Dev.",
         "List payloads, launch selected .firm files\nand create safe hotkey copies.",
         "Choose boot splash palettes, view boot\nmessage help and reset rotating Cow tips.",
-        "Return to the existing Omiiba settings menu.",
+        "Open the classic advanced boot settings\n"
+        "menu for low-level Luma/Omiiba toggles.",
     };
 
     const u32 itemAmount = sizeof(items) / sizeof(items[0]);
@@ -1646,7 +1647,7 @@ static BootHubResult omiibaBootHub(void)
     {
         clearScreens(false);
         drawString(true, 10, 10, COLOR_TITLE, "Omiiba Boot Hub");
-        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: boot settings");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: advanced settings");
 
         for(u32 i = 0; i < itemAmount; i++)
             drawString(true, 10, 10 + (3 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
@@ -1747,6 +1748,14 @@ static void runOmiibaSetupWizard(MultiOptionState *multiOptions, SingleOptionSta
                        "Recommended for Omiiba modding setups.",
                        "enable", "skip"))
         singleOptions[PATCHGAMES].enabled = true;
+
+    if(askBootHubYesNo("External FIRMs/modules",
+                       "Enable the Advanced setting:\n"
+                       "loading external FIRMs and modules?\n\n"
+                       "Most users do not need this. Enable only\n"
+                       "if your setup uses external system files.",
+                       "enable", "skip"))
+        singleOptions[LOADEXTFIRMSANDMODULES].enabled = true;
 
     drawBootHubMessage("GodMode9",
                        "For maintenance tools, place GodMode9 at:\n"
@@ -1954,7 +1963,7 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
                                                "( ) Show GBA boot screen in patched AGB_FIRM",
 
                                                // Should always be the last 3 entries
-                                               "\nOmiiba Boot Hub",
+                                               "\nBack to Omiiba Boot Hub",
                                                "\nBoot chainloader",
                                                "Save and exit"
                                              };
@@ -2043,10 +2052,10 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
                                                  "when booting GBA games.",
 
                                                // Should always be the last 3 entries
-                                               "Open Omiiba's boot hub.\n\n"
-                                               "This groups safe Omiiba tools,\n"
-                                               "GodMode9 shortcuts, diagnostics,\n"
-                                               "profiles, payloads and theme settings.",
+                                               "Return to Omiiba's main Boot Hub.\n\n"
+                                               "Use this after changing advanced\n"
+                                               "settings if you want to continue\n"
+                                               "through the Hub.",
 
                                                "Boot to the Omiiba3DS chainloader menu.",
 
@@ -2111,20 +2120,51 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
     for(u32 i = 0; i < singleOptionsAmount; i++)
         singleOptions[i].enabled = CONFIG(i);
 
+    initScreens();
+
     if(needConfig == CREATE_CONFIGURATION && getFileSize(".setup_wizard_done") == 0)
     {
         runOmiibaSetupWizard(multiOptions, singleOptions);
         settingsDirty = true;
     }
 
-drawConfigScreen:
-    initScreens();
+showBootHubScreen:
+    {
+        BootHubResult hubResult = omiibaBootHub();
+
+        if(hubResult == BOOT_HUB_CONTINUE_BOOT)
+        {
+            skipConfigWrite = !settingsDirty;
+            goto finishConfigMenu;
+        }
+
+        if(hubResult == BOOT_HUB_SAVE_SETTINGS_BOOT)
+        {
+            forceSaveAndBoot = true;
+            goto finishConfigMenu;
+        }
+
+        if(hubResult == BOOT_HUB_RUN_SETUP_WIZARD)
+        {
+            runOmiibaSetupWizard(multiOptions, singleOptions);
+            settingsDirty = true;
+            goto showBootHubScreen;
+        }
+
+        if(hubResult == BOOT_HUB_RUN_PROFILES)
+        {
+            runOmiibaProfiles(multiOptions, singleOptions);
+            settingsDirty = true;
+            goto showBootHubScreen;
+        }
+    }
 
     static const char *bootTypes[] = { "B9S",
                                        "B9S (ntrboot)",
                                        "FIRM0",
                                        "FIRM1" };
 
+    clearScreens(false);
     drawString(true, 10, 10, COLOR_TITLE, CONFIG_TITLE);
     drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "Use the DPAD and A to change settings");
     drawFormattedString(false, 10, SCREEN_HEIGHT - 2 * SPACING_Y, COLOR_YELLOW, "Booted from %s via %s", isSdMode ? "SD" : "CTRNAND", bootTypes[(u32)bootType]);
@@ -2307,7 +2347,7 @@ drawConfigScreen:
                         settingsDirty = true;
                     }
 
-                    goto drawConfigScreen;
+                    goto showBootHubScreen;
                 }
                 else
                 {
@@ -2324,6 +2364,7 @@ drawConfigScreen:
         else if(singleOptions[singleSelected].enabled && singleOptionsText[singleSelected][0] == '(') drawCharacter(true, 10 + SPACING_X, singleOptions[singleSelected].posY, COLOR_RED, selected);
     }
 
+finishConfigMenu:
     bool didSaveConfig = !skipConfigWrite || settingsDirty || forceSaveAndBoot;
 
     if(didSaveConfig)
