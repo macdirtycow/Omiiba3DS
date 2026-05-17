@@ -1440,27 +1440,29 @@ static void showBootHubDiagnostics(void)
     drawFormattedString(true, 10, 10 + 8 * SPACING_Y, COLOR_WHITE,
                         "GBA config: %s", getFileSize("sdmc:/3ds/open_agb_firm/config.ini") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 9 * SPACING_Y, COLOR_WHITE,
-                        "GM9 save script: %s", getFileSize("sdmc:/gm9/scripts/Omiiba_System_Save_Dump.gm9") > 0 ? "found" : "missing");
+                        "GBA ROM folder: %s", directoryExists("sdmc:/gba") ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 10 * SPACING_Y, COLOR_WHITE,
-                        "Payloads: %lu .firm file(s)", countFirmPayloads());
+                        "GM9 save script: %s", getFileSize("sdmc:/gm9/scripts/Omiiba_System_Save_Dump.gm9") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 11 * SPACING_Y, COLOR_WHITE,
-                        "SD boot.firm: %s", getFileSize("sdmc:/boot.firm") > 0 ? "found" : "missing");
+                        "Payloads: %lu .firm file(s)", countFirmPayloads());
     drawFormattedString(true, 10, 10 + 12 * SPACING_Y, COLOR_WHITE,
-                        "CTRNAND boot.firm: %s", getFileSize("nand:/boot.firm") > 0 ? "found" : "missing");
+                        "SD boot.firm: %s", getFileSize("sdmc:/boot.firm") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 13 * SPACING_Y, COLOR_WHITE,
-                        "EmuNAND: %s", emuNandType == FIRMWARE_EMUNAND ? "detected" : "not detected");
+                        "CTRNAND boot.firm: %s", getFileSize("nand:/boot.firm") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 14 * SPACING_Y, COLOR_WHITE,
-                        "Splash: %s", splashMode);
+                        "EmuNAND: %s", emuNandType == FIRMWARE_EMUNAND ? "detected" : "not detected");
     drawFormattedString(true, 10, 10 + 15 * SPACING_Y, COLOR_WHITE,
-                        "Game patching: %s", onOff(CONFIG(PATCHGAMES)));
+                        "Splash: %s", splashMode);
     drawFormattedString(true, 10, 10 + 16 * SPACING_Y, COLOR_WHITE,
+                        "Game patching: %s", onOff(CONFIG(PATCHGAMES)));
+    drawFormattedString(true, 10, 10 + 17 * SPACING_Y, COLOR_WHITE,
                         "Setup wizard: %s", getFileSize(".setup_wizard_done") > 0 ? "done" : "not done");
 
-    drawFormattedString(true, 10, 10 + 18 * SPACING_Y, COLOR_WHITE,
+    drawFormattedString(true, 10, 10 + 19 * SPACING_Y, COLOR_WHITE,
                         "Folders: cheats %s  plugins %s",
                         directoryExists("cheats") ? "ok" : "missing",
                         directoryExists("plugins") ? "ok" : "missing");
-    drawFormattedString(true, 10, 10 + 19 * SPACING_Y, COLOR_WHITE,
+    drawFormattedString(true, 10, 10 + 20 * SPACING_Y, COLOR_WHITE,
                         "         payloads %s  screenshots %s",
                         directoryExists("payloads") ? "ok" : "missing",
                         directoryExists("screenshots") ? "ok" : "missing");

@@ -39,6 +39,14 @@ The preset writer only changes SD:/3ds/open_agb_firm/config.ini. It never
 deletes or empties that file; the restore option writes a complete safe default
 structure. GBA ROM selection, save handling and gameplay remain open_agb_firm
 features.
+
+Recommended ROM folder:
+
+  SD:/gba/
+
+open_agb_firm has a file browser, so this folder is a recommendation rather
+than a hard requirement. Omiiba diagnostics checks it so users have an obvious
+place to put .gba files.
 Credits, licenses and source links are included in:
 
   SD:/THIRD_PARTY/open_agb_firm/

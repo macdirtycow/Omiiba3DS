@@ -15,7 +15,7 @@ This is an **alpha / pre-release** build. The Omiiba3DS GBA Labs integration its
 - **Safe restore behavior:** the restore option writes a complete conservative `config.ini`; it never deletes or empties the file.
 - **Safety prompts:** brighter/heavier color presets warn about battery impact before writing.
 - **Bundled open_agb_firm:** the official unmodified `profi200/open_agb_firm` payload remains included at `SD:/omiiba/payloads/open_agb_firm.firm`, with its GBA database at `SD:/3ds/open_agb_firm/gba_db.bin`.
-- **Diagnostics:** the Boot Hub diagnostics screen now checks `open_agb_firm`, `gba_db.bin` and `open_agb_firm/config.ini`.
+- **Diagnostics:** the Boot Hub diagnostics screen now checks `open_agb_firm`, `gba_db.bin`, `open_agb_firm/config.ini`, and the recommended `SD:/gba/` ROM folder.
 - **Honest AGB_FIRM research entries:** scaling/filter and color-preset ideas are visible in GBA Labs, but clearly labelled research until a safe AGB_FIRM display-driver patch is verified on hardware.
 - **Third-party credits:** `THIRD_PARTY/open_agb_firm/` includes the upstream README, GPLv3 license files, source link, bundled release tag and Omiiba bundle notice.
 - **Version string:** firmware reports **v1.4.4** (see `arm9/Makefile` / top-level `Makefile` `REVISION`).
