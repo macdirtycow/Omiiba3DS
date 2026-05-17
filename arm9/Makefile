@@ -14,8 +14,8 @@ include $(DEVKITARM)/base_rules
 # Override on the command line if you want a different version, e.g.:
 #     make VERSION_MAJOR=1 VERSION_MINOR=4 VERSION_BUILD=0
 export VERSION_MAJOR	?=	1
-export VERSION_MINOR	?=	3
-export VERSION_BUILD	?=	4
+export VERSION_MINOR	?=	4
+export VERSION_BUILD	?=	0
 export IS_RELEASE		?=	1
 export COMMIT			:=	$(shell git rev-parse --short=8 HEAD 2>/dev/null)
 export REVISION			:=	v$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_BUILD)

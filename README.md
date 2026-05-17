@@ -49,6 +49,12 @@ Configuration, layered FS data, plugins, screenshots, and payloads now live unde
 ## Basic usage
 **The main Omiiba3DS configuration menu** can be accessed by pressing <kbd>Select</kbd> at boot. The configuration file is stored in `/omiiba/config.ini` on the SD card (or `/rw/omiiba/config.ini` on the CTRNAND partition if Omiiba3DS has been launched from the CTRNAND partition, which happens when SD card is missing).
 
+**The Omiiba Boot Hub** is available from the configuration menu. It groups Omiiba-specific shortcuts such as GodMode9 tools, diagnostics, profiles, payload management, and theme settings. Profiles provide named presets (`Default`, `Safe`, `Performance`, `Plugin/Game Modding`, `Developer/GDB`) that preview and apply existing safe boot options. Payload Manager lists `.firm` payloads, launches selected payloads, shows hotkey naming help, and can create safe hotkey copies such as `x_GodMode9.firm` without deleting the original file. Theme/settings lets you choose a built-in cold-boot splash palette (`Omiiba amber`, `Midnight blue`, `Pasture green`, `Berry purple`), shows `boot_message.txt` help, and resets rotating Cow tips. The diagnostics screen is read-only and checks items such as `config.ini`, GodMode9, the bundled GM9 script, payload count, SD/CTRNAND `boot.firm`, EmuNAND detection, setup-wizard status, and the expected `/omiiba` folders. Risky maintenance actions stay delegated to GodMode9; place `GodMode9.firm` at `/omiiba/payloads/GodMode9.firm` to use that shortcut.
+
+**The setup wizard** appears on first configuration creation and is also available from the Omiiba Boot Hub. It guides safe defaults for splash position, brightness, game patching, optional external FIRMs/modules, and GodMode9 placement. It writes a small `.setup_wizard_done` marker under `/omiiba` after running.
+
+**System save dump workflow:** install the release zip so `gm9/scripts/Omiiba_System_Save_Dump.gm9` is present, put `GodMode9.firm` in `/omiiba/payloads/`, then open <kbd>Select</kbd> at boot → **Omiiba Boot Hub** → **GodMode9 tools** → **System save dump script**. In GodMode9 run <kbd>HOME</kbd> → **Scripts** → `Omiiba_System_Save_Dump`.
+
 **The chainloader menu** is accessed by pressing <kbd>Start</kbd> at boot, or from the configuration menu. Payloads are expected to be located in `/omiiba/payloads` with the `.firm` extension; if there is only one such payload, the aforementionned selection menu will be skipped. Hotkeys can be assigned to payload, for example `x_test.firm` will be chainloaded when <kbd>X</kbd> is pressed at boot.
 
 **The overlay menu, Rosalina**, has a default button combination: <kbd>L+Down+Select</kbd>. For greater flexbility, most Rosalina menu settings aren't saved automatically, hence the "Save settings" option.
@@ -65,10 +71,16 @@ Everything in the *Description* section above was already present in upstream Lu
 * The on-card data folder moved from `/luma` to `/omiiba`, with an automatic one-shot migration on first boot
 * A custom textual coldboot splash screen (existing `splash.bin` / `splashbottom.bin` files keep working)
 * Rosalina overlay menu retitled "Cow menu" with a burnt-orange / amber-brown title color (`#CC6600`)
-* Hardcoded version `v1.3.4` (no longer derived from upstream Luma git tags)
+* Hardcoded version `v1.4.0` (no longer derived from upstream Luma git tags)
 * Optional one-line tagline from `/omiiba/boot_message.txt` shown on the boot splash
 * Rotating "Cow tip" on the bottom splash (state in `/omiiba/.cow_tip_state`)
 * **Cold-boot splash:** dark panels and accent bars, 2× scaled `OMIIBA3DS` logo, readable muted text, rotating tips kept inside the bottom card (wrapped when needed)
+* **Omiiba Boot Hub:** a boot-menu hub for GodMode9 tools, diagnostics, profiles, payload management and theme settings, while keeping low-level dump/inject work in GodMode9
+* **Setup wizard:** first-boot / on-demand guided setup for safe defaults and GodMode9 placement
+* **Diagnostics:** read-only boot health checks for config, payloads, GodMode9, GM9 scripts, boot.firm locations, EmuNAND and expected folders
+* **Profiles:** named presets for existing Omiiba options (`Default`, `Safe`, `Performance`, `Plugin/Game Modding`, `Developer/GDB`) with confirmation before applying
+* **Payload Manager:** lists and launches `.firm` payloads, explains hotkey naming, and can copy payloads to hotkey-prefixed filenames without destructive renames
+* **Theme/settings:** built-in boot splash palettes stored in `/omiiba/.boot_theme`, custom `boot_message.txt` help, and Cow tip rotation reset
 * A few helper build scripts under `scripts/`
 
 For the full per-file change list, see [`NOTICE-OMIIBA.md`](NOTICE-OMIIBA.md).

@@ -287,14 +287,8 @@ u32 loadNintendoFirm(FirmwareType *firmType, FirmwareSource nandType, bool loadF
     return firmVersion;
 }
 
-void loadHomebrewFirm(u32 pressed)
+void loadHomebrewFirmPath(const char *path, bool hasDisplayedMenu)
 {
-    char path[10 + 255];
-    bool hasDisplayedMenu = false;
-    bool found = !pressed ? payloadMenu(path, &hasDisplayedMenu) : findPayload(path, pressed);
-
-    if(!found) return;
-
     u32 maxPayloadSize = (u32)((u8 *)0x27FFE000 - (u8 *)firm),
         payloadSize = fileRead(firm, path, maxPayloadSize);
 
@@ -312,6 +306,17 @@ void loadHomebrewFirm(u32 pressed)
         initScreens(); // Don't init the screens unless we have to, if not already done
 
     launchFirm(wantsScreenInit ? 2 : 1, argv);
+}
+
+void loadHomebrewFirm(u32 pressed)
+{
+    char path[10 + 255];
+    bool hasDisplayedMenu = false;
+    bool found = !pressed ? payloadMenu(path, &hasDisplayedMenu) : findPayload(path, pressed);
+
+    if(!found) return;
+
+    loadHomebrewFirmPath(path, hasDisplayedMenu);
 }
 
 static int lzss_decompress(u8 *end)

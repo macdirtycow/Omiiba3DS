@@ -260,17 +260,41 @@ static const char *pickCowTip(void)
     return tips[idx % numTips];
 }
 
+typedef struct BootSplashTheme {
+    u32 bg;
+    u32 panel;
+    u32 muted;
+    u32 accent;
+} BootSplashTheme;
+
+static const BootSplashTheme *loadBootSplashTheme(void)
+{
+    static const BootSplashTheme themes[] = {
+        { COLOR_SPLASH_BG, COLOR_SPLASH_PANEL, COLOR_SPLASH_MUTED, COLOR_TITLE }, // Omiiba amber
+        { 0x100B08, 0x261B16, 0xD8C8C0, 0xFFA34B }, // Midnight blue
+        { 0x0C100A, 0x182418, 0xB8D0B8, 0x7AD154 }, // Pasture green
+        { 0x120A12, 0x261826, 0xD8C0D8, 0xFF8CD2 }, // Berry purple
+    };
+
+    u8 idx = 0;
+    if(fileRead(&idx, ".boot_theme", 1) != 1)
+        idx = 0;
+
+    return &themes[idx % (sizeof(themes) / sizeof(themes[0]))];
+}
+
 void omiibaBootSplash(void)
 {
     initScreens();
+    const BootSplashTheme *theme = loadBootSplashTheme();
 
-    arm9FillRect24(fbs[0].top_left,  SCREEN_TOP_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_TOP_WIDTH, SCREEN_HEIGHT, COLOR_SPLASH_BG);
-    arm9FillRect24(fbs[0].bottom, SCREEN_BOTTOM_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_BOTTOM_WIDTH, SCREEN_HEIGHT, COLOR_SPLASH_BG);
+    arm9FillRect24(fbs[0].top_left,  SCREEN_TOP_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_TOP_WIDTH, SCREEN_HEIGHT, theme->bg);
+    arm9FillRect24(fbs[0].bottom, SCREEN_BOTTOM_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_BOTTOM_WIDTH, SCREEN_HEIGHT, theme->bg);
 
     /* Top: subtle panel + accent rails */
-    arm9FillRect24(fbs[0].top_left, SCREEN_TOP_WIDTH, SCREEN_HEIGHT, 40, 78, 320, 108, COLOR_SPLASH_PANEL);
-    arm9FillRect24(fbs[0].top_left, SCREEN_TOP_WIDTH, SCREEN_HEIGHT, 0, 76, SCREEN_TOP_WIDTH, 2, COLOR_TITLE);
-    arm9FillRect24(fbs[0].top_left, SCREEN_TOP_WIDTH, SCREEN_HEIGHT, 0, 186, SCREEN_TOP_WIDTH, 2, COLOR_TITLE);
+    arm9FillRect24(fbs[0].top_left, SCREEN_TOP_WIDTH, SCREEN_HEIGHT, 40, 78, 320, 108, theme->panel);
+    arm9FillRect24(fbs[0].top_left, SCREEN_TOP_WIDTH, SCREEN_HEIGHT, 0, 76, SCREEN_TOP_WIDTH, 2, theme->accent);
+    arm9FillRect24(fbs[0].top_left, SCREEN_TOP_WIDTH, SCREEN_HEIGHT, 0, 186, SCREEN_TOP_WIDTH, 2, theme->accent);
 
     static const char *title    = "OMIIBA3DS";
     static const char *subtitle = "Cow Edition  /  custom firmware";
@@ -283,9 +307,9 @@ void omiibaBootSplash(void)
     u32 forkX  = (SCREEN_TOP_WIDTH - (u32)strlen(fork) * SPACING_X) / 2;
     u32 hintX  = (SCREEN_TOP_WIDTH - (u32)strlen(hint) * SPACING_X) / 2;
 
-    drawBoldStringScaled(true, titleX, 90, COLOR_TITLE, title, titleScale);
-    drawString          (true, subX,  124, COLOR_SPLASH_MUTED, subtitle);
-    drawString          (true, forkX, 142, COLOR_SPLASH_MUTED, fork);
+    drawBoldStringScaled(true, titleX, 90, theme->accent, title, titleScale);
+    drawString          (true, subX,  124, theme->muted, subtitle);
+    drawString          (true, forkX, 142, theme->muted, fork);
 
     char bootMsg[64];
     if (loadBootMessage(bootMsg, sizeof(bootMsg)))
@@ -299,8 +323,8 @@ void omiibaBootSplash(void)
     /* Bottom: card for in-game combo + tip */
     static const u32 panelX = 12;
     static const u32 panelW = 296; // 12..308, leaves 6px margin on each screen edge
-    arm9FillRect24(fbs[0].bottom, SCREEN_BOTTOM_WIDTH, SCREEN_HEIGHT, panelX, 52, panelW, 148, COLOR_SPLASH_PANEL);
-    arm9FillRect24(fbs[0].bottom, SCREEN_BOTTOM_WIDTH, SCREEN_HEIGHT, panelX, 50, panelW, 2, COLOR_TITLE);
+    arm9FillRect24(fbs[0].bottom, SCREEN_BOTTOM_WIDTH, SCREEN_HEIGHT, panelX, 52, panelW, 148, theme->panel);
+    arm9FillRect24(fbs[0].bottom, SCREEN_BOTTOM_WIDTH, SCREEN_HEIGHT, panelX, 50, panelW, 2, theme->accent);
 
     static const char *botTop = "In-game overlay";
     static const char *botBtn = "L  +  Down  +  Select";
@@ -311,9 +335,9 @@ void omiibaBootSplash(void)
     u32 botBtnX = (SCREEN_BOTTOM_WIDTH - (u32)strlen(botBtn) * SPACING_X) / 2;
     u32 tipLabX = (SCREEN_BOTTOM_WIDTH - (u32)strlen(tipLabel) * SPACING_X) / 2;
 
-    drawString(false, botTopX, 64, COLOR_SPLASH_MUTED, botTop);
-    drawBoldString(false, botBtnX, 84, COLOR_TITLE, botBtn);
-    drawString(false, tipLabX, 118, COLOR_TITLE, tipLabel);
+    drawString(false, botTopX, 64, theme->muted, botTop);
+    drawBoldString(false, botBtnX, 84, theme->accent, botBtn);
+    drawString(false, tipLabX, 118, theme->accent, tipLabel);
 
     // Text must stay inside the panel. Centre when it fits, otherwise wrap to
     // two lines on the last space before the limit (hard-cut as final fallback).

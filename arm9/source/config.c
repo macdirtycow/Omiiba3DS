@@ -40,6 +40,7 @@
 #include "i2c.h"
 #include "ini.h"
 #include "firm.h"
+#include "fatfs/ff.h"
 
 #include "config_template_ini.h" // note that it has an extra NUL byte inserted
 
@@ -839,6 +840,1109 @@ void writeConfig(bool isConfigOptions)
         error("Error writing the configuration file");
 }
 
+static void waitForBootHubBack(void)
+{
+    u32 pressed;
+
+    do
+    {
+        pressed = waitInput(true) & (BUTTON_A | BUTTON_B | BUTTON_START);
+    }
+    while(!pressed);
+}
+
+static void drawBootHubMessage(const char *title, const char *message)
+{
+    clearScreens(false);
+    drawString(true, 10, 10, COLOR_TITLE, "Omiiba Boot Hub");
+    drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, title);
+    drawString(true, 10, 10 + 3 * SPACING_Y, COLOR_WHITE, message);
+    drawString(false, 10, 10, COLOR_WHITE, "Press A/B/START to return.");
+}
+
+static bool askBootHubYesNo(const char *title, const char *message, const char *yesText, const char *noText)
+{
+    clearScreens(false);
+    drawString(true, 10, 10, COLOR_TITLE, "Omiiba setup wizard");
+    drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, title);
+    drawString(true, 10, 10 + 3 * SPACING_Y, COLOR_WHITE, message);
+    drawFormattedString(false, 10, 10, COLOR_WHITE, "A: %s\nB: %s", yesText, noText);
+
+    u32 pressed;
+    do
+    {
+        pressed = waitInput(true) & (BUTTON_A | BUTTON_B);
+    }
+    while(!pressed);
+
+    return (pressed & BUTTON_A) != 0;
+}
+
+static const char *findGodMode9Payload(void)
+{
+    static const char *paths[] = {
+        "payloads/GodMode9.firm",
+        "payloads/godmode9.firm",
+        "payloads/GODMODE9.firm",
+    };
+
+    for(u32 i = 0; i < sizeof(paths) / sizeof(paths[0]); i++)
+        if(getFileSize(paths[i]) > 0)
+            return paths[i];
+
+    return NULL;
+}
+
+static bool directoryExists(const char *path)
+{
+    DIR dir;
+    bool exists = f_opendir(&dir, path) == FR_OK;
+
+    if(exists)
+        f_closedir(&dir);
+
+    return exists;
+}
+
+static u32 countFirmPayloads(void)
+{
+    DIR dir;
+    FILINFO info;
+    u32 count = 0;
+
+    if(f_opendir(&dir, "payloads") != FR_OK)
+        return 0;
+
+    while(f_readdir(&dir, &info) == FR_OK && info.fname[0] != 0)
+    {
+        u32 nameLength = strlen(info.fname);
+        if(nameLength >= 6 && memcmp(info.fname + nameLength - 5, ".firm", 5) == 0)
+            count++;
+    }
+
+    f_closedir(&dir);
+    return count;
+}
+
+static u32 listFirmPayloads(char payloadList[][49], u32 maxPayloads)
+{
+    DIR dir;
+    FILINFO info;
+    u32 count = 0;
+
+    if(f_opendir(&dir, "payloads") != FR_OK)
+        return 0;
+
+    while(f_readdir(&dir, &info) == FR_OK && info.fname[0] != 0 && count < maxPayloads)
+    {
+        if(info.fname[0] == '.')
+            continue;
+
+        u32 nameLength = strlen(info.fname);
+        if(nameLength < 6 || nameLength > 52)
+            continue;
+
+        if(memcmp(info.fname + nameLength - 5, ".firm", 5) != 0)
+            continue;
+
+        nameLength -= 5;
+        memcpy(payloadList[count], info.fname, nameLength);
+        payloadList[count][nameLength] = 0;
+        count++;
+    }
+
+    f_closedir(&dir);
+    return count;
+}
+
+static const char *onOff(bool value)
+{
+    return value ? "on" : "off";
+}
+
+static void launchGodMode9Tools(void)
+{
+    static const char *items[] = {
+        "Start GodMode9",
+        "System save dump script",
+        "Back to Boot Hub",
+    };
+
+    static const char *descriptions[] = {
+        "Launch GodMode9 from /omiiba/payloads.",
+        "Launch GodMode9, then run:\n\n"
+        "HOME -> Scripts -> Omiiba_System_Save_Dump\n\n"
+        "The release zip installs this script to\n"
+        "SD:/gm9/scripts/.",
+        "Return to the Omiiba Boot Hub.",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "GodMode9 tools");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: Boot Hub");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (3 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE, descriptions[selectedItem]);
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            const char *path = findGodMode9Payload();
+
+            if(selectedItem == 2)
+                return;
+
+            if(path != NULL)
+                loadHomebrewFirmPath(path, true);
+
+            drawBootHubMessage("GodMode9 tools",
+                               "GodMode9 was not found.\n\n"
+                               "Place GodMode9.firm at:\n"
+                               "SD:/omiiba/payloads/GodMode9.firm\n\n"
+                               "Then reopen this menu to launch it.");
+            waitForBootHubBack();
+        }
+    }
+}
+
+static void showBootHubDiagnostics(void)
+{
+    FirmwareSource emuNandType = FIRMWARE_EMUNAND;
+    u32 emuIndex = 0;
+    if(isSdMode)
+        locateEmuNand(&emuNandType, &emuIndex, false);
+    else
+        emuNandType = FIRMWARE_SYSNAND;
+
+    const char *splashMode;
+    switch(MULTICONFIG(SPLASH))
+    {
+        default:
+        case 0:
+            splashMode = "off";
+            break;
+        case 1:
+            splashMode = "before payloads";
+            break;
+        case 2:
+            splashMode = "after payloads";
+            break;
+    }
+
+    clearScreens(false);
+    drawString(true, 10, 10, COLOR_TITLE, "Omiiba diagnostics");
+    drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "Read-only system checks");
+
+    drawFormattedString(true, 10, 10 + 3 * SPACING_Y, COLOR_WHITE,
+                        "Storage: %s", isSdMode ? "SD:/omiiba" : "CTRNAND:/rw/omiiba");
+    drawFormattedString(true, 10, 10 + 4 * SPACING_Y, COLOR_WHITE,
+                        "config.ini: %s", getFileSize("config.ini") > 0 ? "found" : "missing");
+    drawFormattedString(true, 10, 10 + 5 * SPACING_Y, COLOR_WHITE,
+                        "GodMode9: %s", findGodMode9Payload() != NULL ? "found" : "missing");
+    drawFormattedString(true, 10, 10 + 6 * SPACING_Y, COLOR_WHITE,
+                        "GM9 save script: %s", getFileSize("sdmc:/gm9/scripts/Omiiba_System_Save_Dump.gm9") > 0 ? "found" : "missing");
+    drawFormattedString(true, 10, 10 + 7 * SPACING_Y, COLOR_WHITE,
+                        "Payloads: %lu .firm file(s)", countFirmPayloads());
+    drawFormattedString(true, 10, 10 + 8 * SPACING_Y, COLOR_WHITE,
+                        "SD boot.firm: %s", getFileSize("sdmc:/boot.firm") > 0 ? "found" : "missing");
+    drawFormattedString(true, 10, 10 + 9 * SPACING_Y, COLOR_WHITE,
+                        "CTRNAND boot.firm: %s", getFileSize("nand:/boot.firm") > 0 ? "found" : "missing");
+    drawFormattedString(true, 10, 10 + 10 * SPACING_Y, COLOR_WHITE,
+                        "EmuNAND: %s", emuNandType == FIRMWARE_EMUNAND ? "detected" : "not detected");
+    drawFormattedString(true, 10, 10 + 11 * SPACING_Y, COLOR_WHITE,
+                        "Splash: %s", splashMode);
+    drawFormattedString(true, 10, 10 + 12 * SPACING_Y, COLOR_WHITE,
+                        "Game patching: %s", onOff(CONFIG(PATCHGAMES)));
+    drawFormattedString(true, 10, 10 + 13 * SPACING_Y, COLOR_WHITE,
+                        "Setup wizard: %s", getFileSize(".setup_wizard_done") > 0 ? "done" : "not done");
+
+    drawFormattedString(true, 10, 10 + 15 * SPACING_Y, COLOR_WHITE,
+                        "Folders: cheats %s  plugins %s",
+                        directoryExists("cheats") ? "ok" : "missing",
+                        directoryExists("plugins") ? "ok" : "missing");
+    drawFormattedString(true, 10, 10 + 16 * SPACING_Y, COLOR_WHITE,
+                        "         payloads %s  screenshots %s",
+                        directoryExists("payloads") ? "ok" : "missing",
+                        directoryExists("screenshots") ? "ok" : "missing");
+
+    drawString(false, 10, 10, COLOR_WHITE,
+               "Diagnostics only reads files, folders and\n"
+               "existing config values. It does not change NAND.\n\n"
+               "Missing items are guidance, not always errors.\n"
+               "For example, CTRNAND boot.firm and GodMode9\n"
+               "are optional but recommended for recovery.\n\n"
+               "Press A/B/START to return.");
+    waitForBootHubBack();
+}
+
+static bool choosePayloadHotkey(const char **prefix, const char **label)
+{
+    static const char *items[] = {
+        "X",
+        "Y",
+        "B",
+        "A while holding L",
+        "START while holding L",
+        "SELECT while holding L",
+        "Back",
+    };
+
+    static const char *prefixes[] = {
+        "x",
+        "y",
+        "b",
+        "a",
+        "start",
+        "select",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "Payload hotkey copy");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: choose    B: cancel");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (3 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE,
+                   "Creates a copy named like x_name.firm.\n\n"
+                   "This does not rename or delete the original\n"
+                   "payload, so it is safe to undo manually.");
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return false;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            if(selectedItem >= itemAmount - 1)
+                return false;
+
+            *prefix = prefixes[selectedItem];
+            *label = items[selectedItem];
+            return true;
+        }
+    }
+}
+
+static void copyPayloadAsHotkey(const char *payloadName)
+{
+    const char *prefix, *label;
+    char src[10 + 49 + 5];
+    char dst[10 + 49 + 5 + 8];
+    static u8 copyBuffer[0x10000];
+
+    if(!choosePayloadHotkey(&prefix, &label))
+        return;
+
+    sprintf(src, "payloads/%s.firm", payloadName);
+    sprintf(dst, "payloads/%s_%s.firm", prefix, payloadName);
+
+    clearScreens(false);
+    drawString(true, 10, 10, COLOR_TITLE, "Payload hotkey copy");
+    drawFormattedString(true, 10, 10 + 2 * SPACING_Y, COLOR_WHITE,
+                        "Copy:\n%s\n\nto:\n%s\n\nHotkey: %s", src, dst, label);
+    drawString(false, 10, 10, COLOR_WHITE,
+               "A: create copy\nB: cancel\n\n"
+               "Existing destination files are not overwritten.");
+
+    u32 pressed;
+    do
+    {
+        pressed = waitInput(true) & (BUTTON_A | BUTTON_B);
+    }
+    while(!pressed);
+
+    if(!(pressed & BUTTON_A))
+        return;
+
+    if(fileCopy(src, dst, false, copyBuffer, sizeof(copyBuffer)))
+        drawBootHubMessage("Payload copied",
+                           "Hotkey copy created.\n\n"
+                           "If the file already existed, no overwrite\n"
+                           "was performed.");
+    else
+        drawBootHubMessage("Payload copy failed",
+                           "Could not create the hotkey copy.\n\n"
+                           "Check free SD space and whether a file\n"
+                           "with that hotkey name already exists.");
+
+    waitForBootHubBack();
+}
+
+static void showPayloadHotkeyGuide(void)
+{
+    drawBootHubMessage("Payload hotkeys",
+                       "Supported names:\n"
+                       "x_name.firm / y_name.firm / b_name.firm\n"
+                       "a_name.firm boots with L + A\n"
+                       "start_name.firm boots with L + START\n"
+                       "select_name.firm boots with L + SELECT\n\n"
+                       "START alone opens the chainloader menu.");
+    waitForBootHubBack();
+}
+
+static void runPayloadManager(void)
+{
+    char payloadList[20][49];
+    u32 selectedPayload = 0;
+
+    while(true)
+    {
+        u32 payloadAmount = listFirmPayloads(payloadList, 20);
+
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "Payload manager");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: menu    B: Boot Hub");
+
+        if(payloadAmount == 0)
+        {
+            drawString(true, 10, 10 + 3 * SPACING_Y, COLOR_WHITE,
+                       "No .firm payloads found in /omiiba/payloads.");
+            drawString(false, 10, 10, COLOR_WHITE,
+                       "Put GodMode9.firm or other payloads in:\n"
+                       "SD:/omiiba/payloads/\n\n"
+                       "Press A for hotkey naming help,\n"
+                       "or B to return.");
+        }
+        else
+        {
+            for(u32 i = 0; i < payloadAmount; i++)
+                drawString(true, 10, 10 + (3 + i) * SPACING_Y, i == selectedPayload ? COLOR_RED : COLOR_WHITE, payloadList[i]);
+
+            drawFormattedString(false, 10, 10, COLOR_WHITE,
+                                "Selected: %s.firm\n\n"
+                                "A: actions\nB: return\n\n"
+                                "Actions: launch, copy as hotkey,\n"
+                                "hotkey guide.", payloadList[selectedPayload]);
+        }
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return;
+
+        if(payloadAmount == 0)
+        {
+            if(pressed & BUTTON_A)
+                showPayloadHotkeyGuide();
+            continue;
+        }
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedPayload = !selectedPayload ? payloadAmount - 1 : selectedPayload - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedPayload = selectedPayload == payloadAmount - 1 ? 0 : selectedPayload + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedPayload = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedPayload = payloadAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            static const char *actions[] = {
+                "Launch selected payload",
+                "Copy selected as hotkey",
+                "Hotkey guide",
+                "Back",
+            };
+            u32 selectedAction = 0;
+
+            while(true)
+            {
+                clearScreens(false);
+                drawString(true, 10, 10, COLOR_TITLE, "Payload actions");
+                drawFormattedString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "%s.firm", payloadList[selectedPayload]);
+
+                for(u32 i = 0; i < sizeof(actions) / sizeof(actions[0]); i++)
+                    drawString(true, 10, 10 + (3 + i) * SPACING_Y, i == selectedAction ? COLOR_RED : COLOR_WHITE, actions[i]);
+
+                drawString(false, 10, 10, COLOR_WHITE,
+                           "Launch uses the same chainloader as START.\n\n"
+                           "Copy as hotkey creates a duplicate with\n"
+                           "x_/y_/b_/a_/start_/select_ prefix.");
+
+                do
+                {
+                    pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+                }
+                while(!pressed);
+
+                if(pressed & BUTTON_B)
+                    break;
+
+                if(pressed & DPAD_BUTTONS)
+                {
+                    switch(pressed & DPAD_BUTTONS)
+                    {
+                        case BUTTON_UP:
+                            selectedAction = !selectedAction ? 3 : selectedAction - 1;
+                            break;
+                        case BUTTON_DOWN:
+                            selectedAction = selectedAction == 3 ? 0 : selectedAction + 1;
+                            break;
+                        case BUTTON_LEFT:
+                            selectedAction = 0;
+                            break;
+                        case BUTTON_RIGHT:
+                            selectedAction = 3;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else if(pressed & BUTTON_A)
+                {
+                    char path[10 + 49 + 5];
+                    sprintf(path, "payloads/%s.firm", payloadList[selectedPayload]);
+
+                    switch(selectedAction)
+                    {
+                        case 0:
+                            loadHomebrewFirmPath(path, true);
+                            break;
+                        case 1:
+                            copyPayloadAsHotkey(payloadList[selectedPayload]);
+                            break;
+                        case 2:
+                            showPayloadHotkeyGuide();
+                            break;
+                        default:
+                            break;
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+}
+
+static const char *bootThemeName(u8 idx)
+{
+    static const char *names[] = {
+        "Omiiba amber",
+        "Midnight blue",
+        "Pasture green",
+        "Berry purple",
+    };
+
+    return names[idx % (sizeof(names) / sizeof(names[0]))];
+}
+
+static u8 readBootThemeIndex(void)
+{
+    u8 idx = 0;
+    if(fileRead(&idx, ".boot_theme", 1) != 1)
+        idx = 0;
+
+    return idx % 4;
+}
+
+static void writeBootThemeIndex(u8 idx)
+{
+    idx %= 4;
+    fileWrite(&idx, ".boot_theme", 1);
+}
+
+static void chooseBootTheme(void)
+{
+    const u32 themeAmount = 4;
+    u32 selectedTheme = readBootThemeIndex();
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "Boot splash theme");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: save theme    B: cancel");
+
+        for(u32 i = 0; i < themeAmount; i++)
+            drawString(true, 10, 10 + (3 + i) * SPACING_Y, i == selectedTheme ? COLOR_RED : COLOR_WHITE, bootThemeName((u8)i));
+
+        drawFormattedString(false, 10, 10, COLOR_WHITE,
+                            "Current choice: %s\n\n"
+                            "This changes the cold-boot splash\n"
+                            "background, panels, muted text and accent.\n\n"
+                            "It is stored in /omiiba/.boot_theme.",
+                            bootThemeName((u8)selectedTheme));
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedTheme = !selectedTheme ? themeAmount - 1 : selectedTheme - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedTheme = selectedTheme == themeAmount - 1 ? 0 : selectedTheme + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedTheme = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedTheme = themeAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            writeBootThemeIndex((u8)selectedTheme);
+            drawBootHubMessage("Theme saved",
+                               "Boot splash theme saved.\n\n"
+                               "You will see it on the next cold boot\n"
+                               "when the Omiiba splash is shown.");
+            waitForBootHubBack();
+            return;
+        }
+    }
+}
+
+static void runThemeSettings(void)
+{
+    static const char *items[] = {
+        "Choose boot splash theme",
+        "Boot message help",
+        "Reset Cow tip rotation",
+        "Back to Boot Hub",
+    };
+
+    static const char *descriptions[] = {
+        "Select one of the built-in Omiiba splash palettes.",
+        "Custom one-line boot tagline:\n\n"
+        "SD:/omiiba/boot_message.txt\n\n"
+        "Only the first line is shown.",
+        "Delete /omiiba/.cow_tip_state so the\n"
+        "rotating tips start from the first tip again.",
+        "Return to the Omiiba Boot Hub.",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "Theme/settings");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: Boot Hub");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (3 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE, descriptions[selectedItem]);
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            switch(selectedItem)
+            {
+                case 0:
+                    chooseBootTheme();
+                    break;
+                case 1:
+                    drawBootHubMessage("Boot message",
+                                       "Create this text file:\n"
+                                       "SD:/omiiba/boot_message.txt\n\n"
+                                       "The first line is shown on the\n"
+                                       "top-screen boot splash.");
+                    waitForBootHubBack();
+                    break;
+                case 2:
+                    fileDelete(".cow_tip_state");
+                    drawBootHubMessage("Cow tips reset",
+                                       "Tip rotation state was reset.\n\n"
+                                       "The next splash starts from the\n"
+                                       "first built-in Cow tip again.");
+                    waitForBootHubBack();
+                    break;
+                default:
+                    return;
+            }
+        }
+    }
+}
+
+typedef enum
+{
+    BOOT_HUB_BACK_TO_SETTINGS = 0,
+    BOOT_HUB_CONTINUE_BOOT,
+    BOOT_HUB_RUN_SETUP_WIZARD,
+    BOOT_HUB_RUN_PROFILES,
+} BootHubResult;
+
+typedef struct
+{
+    u32 posXs[4];
+    u32 posY;
+    u32 enabled;
+    bool visible;
+} MultiOptionState;
+
+typedef struct
+{
+    u32 posY;
+    bool enabled;
+    bool visible;
+} SingleOptionState;
+
+static BootHubResult omiibaBootHub(void)
+{
+    static const char *items[] = {
+        "Continue normal boot",
+        "Setup wizard",
+        "Boot chainloader",
+        "GodMode9 tools",
+        "Diagnostics",
+        "Profiles",
+        "Payload manager",
+        "Theme/settings",
+        "Back to boot settings",
+    };
+
+    static const char *descriptions[] = {
+        "Save current settings and continue booting Omiiba3DS.",
+        "Run a guided first setup for splash,\nbrightness, game patching and GodMode9.",
+        "Open the standard payload chainloader.\n\nEquivalent to holding START at boot.",
+        "Launch GodMode9 from /omiiba/payloads.\n\nLow-level dumping remains delegated to GodMode9.",
+        "Show safe read-only checks for Omiiba setup health.",
+        "Apply named safe setting groups:\nDefault, Safe, Performance, Modding, Dev.",
+        "List payloads, launch selected .firm files\nand create safe hotkey copies.",
+        "Choose boot splash palettes, view boot\nmessage help and reset rotating Cow tips.",
+        "Return to the existing Omiiba settings menu.",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "Omiiba Boot Hub");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: boot settings");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (3 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE, descriptions[selectedItem]);
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return BOOT_HUB_BACK_TO_SETTINGS;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            switch(selectedItem)
+            {
+                case 0:
+                    return BOOT_HUB_CONTINUE_BOOT;
+                case 1:
+                    return BOOT_HUB_RUN_SETUP_WIZARD;
+                case 2:
+                    loadHomebrewFirm(0);
+                    break;
+                case 3:
+                    launchGodMode9Tools();
+                    break;
+                case 4:
+                    showBootHubDiagnostics();
+                    break;
+                case 5:
+                    return BOOT_HUB_RUN_PROFILES;
+                case 6:
+                    runPayloadManager();
+                    break;
+                case 7:
+                    runThemeSettings();
+                    break;
+                default:
+                    return BOOT_HUB_BACK_TO_SETTINGS;
+            }
+        }
+    }
+}
+
+static void runOmiibaSetupWizard(MultiOptionState *multiOptions, SingleOptionState *singleOptions)
+{
+    drawBootHubMessage("Setup wizard",
+                       "This wizard changes only existing safe\n"
+                       "Omiiba settings.\n\n"
+                       "You can review them in the settings menu\n"
+                       "before saving.");
+    waitForBootHubBack();
+
+    if(askBootHubYesNo("Splash screen",
+                       "Show the Omiiba splash before payloads?\n\n"
+                       "Recommended if you use payload hotkeys.",
+                       "enable", "skip"))
+        multiOptions[SPLASH].enabled = 1;
+
+    if(askBootHubYesNo("Screen brightness",
+                       "Use bright boot/menu screens?\n\n"
+                       "You can still change this later.",
+                       "bright", "keep"))
+    {
+        multiOptions[BRIGHTNESS].enabled = 0;
+        updateBrightness(multiOptions[BRIGHTNESS].enabled);
+    }
+
+    if(askBootHubYesNo("Game patching",
+                       "Enable game patching for LayeredFS,\n"
+                       "IPS patches, plugins and modding?\n\n"
+                       "Recommended for Omiiba modding setups.",
+                       "enable", "skip"))
+        singleOptions[PATCHGAMES].enabled = true;
+
+    if(askBootHubYesNo("External FIRMs/modules",
+                       "Enable external FIRMs and modules?\n\n"
+                       "Most users do not need this. Enable only\n"
+                       "if your setup uses external system files.",
+                       "enable", "skip"))
+        singleOptions[LOADEXTFIRMSANDMODULES].enabled = true;
+
+    drawBootHubMessage("GodMode9",
+                       "For maintenance tools, place GodMode9 at:\n"
+                       "SD:/omiiba/payloads/GodMode9.firm\n\n"
+                       "System save dumps are handled by the\n"
+                       "included GM9 script, not by Omiiba itself.");
+    waitForBootHubBack();
+
+    static const char setupDone[] = "1\n";
+    fileWrite(setupDone, ".setup_wizard_done", sizeof(setupDone) - 1);
+}
+
+static void applyDefaultProfile(MultiOptionState *multiOptions, SingleOptionState *singleOptions)
+{
+    multiOptions[SPLASH].enabled = 1;       // before payloads
+    multiOptions[BRIGHTNESS].enabled = 1;   // level 3
+    multiOptions[NEWCPU].enabled = 0;
+
+    singleOptions[PATCHGAMES].enabled = true;
+    singleOptions[LOADEXTFIRMSANDMODULES].enabled = false;
+    singleOptions[REDIRECTAPPTHREADS].enabled = false;
+}
+
+static void applySafeProfile(MultiOptionState *multiOptions, SingleOptionState *singleOptions)
+{
+    multiOptions[SPLASH].enabled = 1;
+    multiOptions[BRIGHTNESS].enabled = 1;
+    multiOptions[NEWCPU].enabled = 0;
+
+    singleOptions[PATCHGAMES].enabled = false;
+    singleOptions[LOADEXTFIRMSANDMODULES].enabled = false;
+    singleOptions[REDIRECTAPPTHREADS].enabled = false;
+}
+
+static void applyPerformanceProfile(MultiOptionState *multiOptions, SingleOptionState *singleOptions)
+{
+    multiOptions[SPLASH].enabled = 1;
+    multiOptions[BRIGHTNESS].enabled = 0;
+    if(ISN3DS)
+        multiOptions[NEWCPU].enabled = 1; // Clock only, safer than Clock+L2.
+
+    singleOptions[PATCHGAMES].enabled = true;
+    singleOptions[REDIRECTAPPTHREADS].enabled = ISN3DS;
+}
+
+static void applyModdingProfile(MultiOptionState *multiOptions, SingleOptionState *singleOptions)
+{
+    multiOptions[SPLASH].enabled = 1;
+    multiOptions[BRIGHTNESS].enabled = 0;
+
+    singleOptions[PATCHGAMES].enabled = true;
+    singleOptions[LOADEXTFIRMSANDMODULES].enabled = false;
+    singleOptions[REDIRECTAPPTHREADS].enabled = false;
+}
+
+static void applyDeveloperProfile(MultiOptionState *multiOptions, SingleOptionState *singleOptions)
+{
+    multiOptions[SPLASH].enabled = 1;
+    multiOptions[BRIGHTNESS].enabled = 0;
+    if(ISN3DS)
+        multiOptions[NEWCPU].enabled = 1;
+
+    singleOptions[PATCHGAMES].enabled = true;
+    singleOptions[LOADEXTFIRMSANDMODULES].enabled = true;
+    singleOptions[REDIRECTAPPTHREADS].enabled = ISN3DS;
+}
+
+static void runOmiibaProfiles(MultiOptionState *multiOptions, SingleOptionState *singleOptions)
+{
+    static const char *items[] = {
+        "Default",
+        "Safe",
+        "Performance",
+        "Plugin/Game Modding",
+        "Developer/GDB",
+        "Back to Boot Hub",
+    };
+
+    static const char *descriptions[] = {
+        "Balanced Omiiba defaults:\n"
+        "- Splash before payloads\n"
+        "- Brightness level 3\n"
+        "- Game patching on\n"
+        "- External FIRMs off\n"
+        "- CPU tweaks off",
+
+        "Maximum compatibility:\n"
+        "- Splash before payloads\n"
+        "- Game patching off\n"
+        "- External FIRMs off\n"
+        "- CPU/thread tweaks off",
+
+        "Performance-oriented:\n"
+        "- Brightest boot/menu screen\n"
+        "- Game patching on\n"
+        "- New 3DS clock mode (N3DS only)\n"
+        "- App syscore redirect (N3DS only)",
+
+        "Modding/plugin setup:\n"
+        "- Bright splash before payloads\n"
+        "- Game patching on\n"
+        "- External FIRMs off\n"
+        "- CPU/thread tweaks off",
+
+        "Developer setup:\n"
+        "- Game patching on\n"
+        "- External FIRMs/modules on\n"
+        "- New 3DS clock mode (N3DS only)\n"
+        "- App syscore redirect (N3DS only)",
+
+        "Return without applying a profile.",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "Omiiba profiles");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: preview/apply    B: Boot Hub");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (3 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE, descriptions[selectedItem]);
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            if(selectedItem == itemAmount - 1)
+                return;
+
+            if(!askBootHubYesNo("Apply profile?", descriptions[selectedItem], "apply", "cancel"))
+                continue;
+
+            switch(selectedItem)
+            {
+                case 0:
+                    applyDefaultProfile(multiOptions, singleOptions);
+                    break;
+                case 1:
+                    applySafeProfile(multiOptions, singleOptions);
+                    break;
+                case 2:
+                    applyPerformanceProfile(multiOptions, singleOptions);
+                    break;
+                case 3:
+                    applyModdingProfile(multiOptions, singleOptions);
+                    break;
+                case 4:
+                    applyDeveloperProfile(multiOptions, singleOptions);
+                    break;
+                default:
+                    break;
+            }
+
+            updateBrightness(multiOptions[BRIGHTNESS].enabled);
+            drawBootHubMessage("Profile applied",
+                               "Profile applied to pending settings.\n\n"
+                               "Use Save and exit or Continue normal\n"
+                               "boot to write config.ini.");
+            waitForBootHubBack();
+            return;
+        }
+    }
+}
+
 void configMenu(bool oldPinStatus, u32 oldPinMode)
 {
     static const char *multiOptionsText[]  = { "Default EmuNAND: 1( ) 2( ) 3( ) 4( )",
@@ -856,7 +1960,8 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
                                                "( ) Show NAND or user string in System Settings",
                                                "( ) Show GBA boot screen in patched AGB_FIRM",
 
-                                               // Should always be the last 2 entries
+                                               // Should always be the last 3 entries
+                                               "\nOmiiba Boot Hub",
                                                "\nBoot chainloader",
                                                "Save and exit"
                                              };
@@ -944,8 +2049,13 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
                                                  "Enable showing the GBA boot screen\n"
                                                  "when booting GBA games.",
 
-                                                // Should always be the last 2 entries
-                                                "Boot to the Omiiba3DS chainloader menu.",
+                                               // Should always be the last 3 entries
+                                               "Open Omiiba's boot hub.\n\n"
+                                               "This groups safe Omiiba tools,\n"
+                                               "GodMode9 shortcuts, diagnostics,\n"
+                                               "profiles, payloads and theme settings.",
+
+                                               "Boot to the Omiiba3DS chainloader menu.",
 
                                                  "Save the changes and exit. To discard\n"
                                                  "any changes press the POWER button.\n"
@@ -961,12 +2071,7 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
         locateEmuNand(&nandType, &emuIndex, false);
     }
 
-    struct multiOption {
-        u32 posXs[4];
-        u32 posY;
-        u32 enabled;
-        bool visible;
-    } multiOptions[] = {
+    MultiOptionState multiOptions[] = {
         { .visible = nandType == FIRMWARE_EMUNAND },
         { .visible = true },
         { .visible = true },
@@ -976,11 +2081,7 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
         // { .visible = true }, audio rerouting, hidden
     };
 
-    struct singleOption {
-        u32 posY;
-        bool enabled;
-        bool visible;
-    } singleOptions[] = {
+    SingleOptionState singleOptions[] = {
         { .visible = nandType == FIRMWARE_EMUNAND },
         { .visible = true },
         { .visible = true },
@@ -989,11 +2090,12 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
         { .visible = true },
         { .visible = true },
         { .visible = true },
+        { .visible = true },
     };
 
     //Calculate the amount of the various kinds of options and pre-select the first single one
-    u32 multiOptionsAmount = sizeof(multiOptions) / sizeof(struct multiOption),
-        singleOptionsAmount = sizeof(singleOptions) / sizeof(struct singleOption),
+    u32 multiOptionsAmount = sizeof(multiOptions) / sizeof(MultiOptionState),
+        singleOptionsAmount = sizeof(singleOptions) / sizeof(SingleOptionState),
         totalIndexes = multiOptionsAmount + singleOptionsAmount - 1,
         selectedOption = 0,
         singleSelected = 0;
@@ -1013,6 +2115,10 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
     for(u32 i = 0; i < singleOptionsAmount; i++)
         singleOptions[i].enabled = CONFIG(i);
 
+    if(needConfig == CREATE_CONFIGURATION && getFileSize(".setup_wizard_done") == 0)
+        runOmiibaSetupWizard(multiOptions, singleOptions);
+
+drawConfigScreen:
     initScreens();
 
     static const char *bootTypes[] = { "B9S",
@@ -1169,6 +2275,24 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
                 else if (singleSelected == singleOptionsAmount - 2) {
                     loadHomebrewFirm(0);
                     break;
+                }
+                else if (singleSelected == singleOptionsAmount - 3)
+                {
+                    BootHubResult hubResult = omiibaBootHub();
+
+                    if(hubResult == BOOT_HUB_CONTINUE_BOOT)
+                    {
+                        startPressed = false;
+                        break;
+                    }
+
+                    if(hubResult == BOOT_HUB_RUN_SETUP_WIZARD)
+                        runOmiibaSetupWizard(multiOptions, singleOptions);
+
+                    if(hubResult == BOOT_HUB_RUN_PROFILES)
+                        runOmiibaProfiles(multiOptions, singleOptions);
+
+                    goto drawConfigScreen;
                 }
                 else
                 {
