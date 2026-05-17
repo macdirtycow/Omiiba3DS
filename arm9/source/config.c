@@ -1399,6 +1399,124 @@ static void launchGbaLabs(void)
     }
 }
 
+static void launchDsLabs(void)
+{
+    static const char *items[] = {
+        "DS setup status",
+        "TWiLight Menu++ help",
+        "TWL filter help",
+        "DS ROM folder notes",
+        "Back to Boot Hub",
+    };
+
+    static const char *descriptions[] = {
+        "Check common DS/TWiLight folders and files.\n\n"
+        "This is read-only and does not change SD.",
+        "Recommended DS SD-card stack:\n\n"
+        "TWiLight Menu++ + nds-bootstrap.\n\n"
+        "Install it separately, then put DS ROMs in\n"
+        "SD:/roms/nds/.",
+        "Omiiba can patch TWL_FIRM's upscaling filter\n"
+        "when Advanced setting Enable DSi external\n"
+        "filter is on and this file exists:\n\n"
+        "SD:/omiiba/twl_upscaling_filter.bin",
+        "Recommended DS ROM folder:\n\n"
+        "SD:/roms/nds/\n\n"
+        "TWiLight Menu++ uses a file browser, so this\n"
+        "is guidance rather than a hard requirement.",
+        "Return to the Omiiba Boot Hub.",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "DS Labs");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: Boot Hub");
+        drawString(true, 10, 10 + 2 * SPACING_Y, COLOR_WHITE, "TWiLight/nds-bootstrap setup help");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (4 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE, descriptions[selectedItem]);
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            if(selectedItem == 0)
+            {
+                clearScreens(false);
+                drawString(true, 10, 10, COLOR_TITLE, "DS setup status");
+                drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "Read-only DS/TWL checks");
+
+                drawFormattedString(true, 10, 10 + 3 * SPACING_Y, COLOR_WHITE,
+                                    "DS ROM folder: %s", directoryExists("sdmc:/roms/nds") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 4 * SPACING_Y, COLOR_WHITE,
+                                    "TWiLight _nds: %s", directoryExists("sdmc:/_nds") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 5 * SPACING_Y, COLOR_WHITE,
+                                    "TWiLightMenu: %s", directoryExists("sdmc:/_nds/TWiLightMenu") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 6 * SPACING_Y, COLOR_WHITE,
+                                    "nds-bootstrap: %s",
+                                    getFileSize("sdmc:/_nds/nds-bootstrap-release.nds") > 0 ||
+                                    getFileSize("sdmc:/_nds/nds-bootstrap.nds") > 0 ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 7 * SPACING_Y, COLOR_WHITE,
+                                    "Cheat DB: %s", getFileSize("sdmc:/_nds/TWiLightMenu/extras/usrcheat.dat") > 0 ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 8 * SPACING_Y, COLOR_WHITE,
+                                    "TWL filter bin: %s", getFileSize("twl_upscaling_filter.bin") > 0 ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 9 * SPACING_Y, COLOR_WHITE,
+                                    "TWL external filter: %s", onOff(CONFIG(ENABLEDSIEXTFILTER)));
+
+                drawString(false, 10, 10, COLOR_WHITE,
+                           "Recommended DS ROM folder:\n"
+                           "SD:/roms/nds/\n\n"
+                           "TWiLight Menu++ and nds-bootstrap are\n"
+                           "not bundled by Omiiba3DS.\n\n"
+                           "Press A/B/START to return.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == itemAmount - 1)
+                return;
+            else
+            {
+                drawBootHubMessage("DS Labs",
+                                   descriptions[selectedItem]);
+                waitForBootHubBack();
+            }
+        }
+    }
+}
+
 static void showBootHubDiagnostics(void)
 {
     FirmwareSource emuNandType = FIRMWARE_EMUNAND;
@@ -1442,30 +1560,23 @@ static void showBootHubDiagnostics(void)
     drawFormattedString(true, 10, 10 + 9 * SPACING_Y, COLOR_WHITE,
                         "GBA ROM folder: %s", directoryExists("sdmc:/gba") ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 10 * SPACING_Y, COLOR_WHITE,
-                        "GM9 save script: %s", getFileSize("sdmc:/gm9/scripts/Omiiba_System_Save_Dump.gm9") > 0 ? "found" : "missing");
+                        "DS ROM folder: %s", directoryExists("sdmc:/roms/nds") ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 11 * SPACING_Y, COLOR_WHITE,
-                        "Payloads: %lu .firm file(s)", countFirmPayloads());
+                        "TWiLight _nds: %s", directoryExists("sdmc:/_nds") ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 12 * SPACING_Y, COLOR_WHITE,
-                        "SD boot.firm: %s", getFileSize("sdmc:/boot.firm") > 0 ? "found" : "missing");
+                        "TWL filter bin: %s", getFileSize("twl_upscaling_filter.bin") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 13 * SPACING_Y, COLOR_WHITE,
-                        "CTRNAND boot.firm: %s", getFileSize("nand:/boot.firm") > 0 ? "found" : "missing");
+                        "GM9 save script: %s", getFileSize("sdmc:/gm9/scripts/Omiiba_System_Save_Dump.gm9") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 14 * SPACING_Y, COLOR_WHITE,
-                        "EmuNAND: %s", emuNandType == FIRMWARE_EMUNAND ? "detected" : "not detected");
+                        "Payloads: %lu .firm file(s)", countFirmPayloads());
     drawFormattedString(true, 10, 10 + 15 * SPACING_Y, COLOR_WHITE,
-                        "Splash: %s", splashMode);
+                        "SD boot.firm: %s", getFileSize("sdmc:/boot.firm") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 16 * SPACING_Y, COLOR_WHITE,
-                        "Game patching: %s", onOff(CONFIG(PATCHGAMES)));
+                        "CTRNAND boot.firm: %s", getFileSize("nand:/boot.firm") > 0 ? "found" : "missing");
     drawFormattedString(true, 10, 10 + 17 * SPACING_Y, COLOR_WHITE,
-                        "Setup wizard: %s", getFileSize(".setup_wizard_done") > 0 ? "done" : "not done");
-
-    drawFormattedString(true, 10, 10 + 19 * SPACING_Y, COLOR_WHITE,
-                        "Folders: cheats %s  plugins %s",
-                        directoryExists("cheats") ? "ok" : "missing",
-                        directoryExists("plugins") ? "ok" : "missing");
-    drawFormattedString(true, 10, 10 + 20 * SPACING_Y, COLOR_WHITE,
-                        "         payloads %s  screenshots %s",
-                        directoryExists("payloads") ? "ok" : "missing",
-                        directoryExists("screenshots") ? "ok" : "missing");
+                        "EmuNAND: %s", emuNandType == FIRMWARE_EMUNAND ? "detected" : "not detected");
+    drawFormattedString(true, 10, 10 + 18 * SPACING_Y, COLOR_WHITE,
+                        "Splash: %s", splashMode);
 
     drawString(false, 10, 10, COLOR_WHITE,
                "Diagnostics only reads files, folders and\n"
@@ -1983,6 +2094,7 @@ static BootHubResult omiibaBootHub(void)
         "Boot chainloader",
         "GodMode9 tools",
         "GBA Labs",
+        "DS Labs",
         "Diagnostics",
         "Profiles",
         "Payload manager",
@@ -2000,6 +2112,7 @@ static BootHubResult omiibaBootHub(void)
         "Open the standard payload chainloader.\n\nEquivalent to holding START at boot.",
         "Launch GodMode9 from /omiiba/payloads.\n\nLow-level dumping remains delegated to GodMode9.",
         "Launch open_agb_firm and view experimental\nGBA display research notes.",
+        "Check TWiLight/nds-bootstrap folders,\nDS ROM path and TWL filter setup.",
         "Show safe read-only checks for Omiiba setup health.",
         "Apply named safe setting groups:\nDefault, Safe, Performance, Modding, Dev.",
         "List payloads, launch selected .firm files\nand create safe hotkey copies.",
@@ -2072,14 +2185,17 @@ static BootHubResult omiibaBootHub(void)
                     launchGbaLabs();
                     break;
                 case 6:
-                    showBootHubDiagnostics();
+                    launchDsLabs();
                     break;
                 case 7:
-                    return BOOT_HUB_RUN_PROFILES;
+                    showBootHubDiagnostics();
+                    break;
                 case 8:
+                    return BOOT_HUB_RUN_PROFILES;
+                case 9:
                     runPayloadManager();
                     break;
-                case 9:
+                case 10:
                     runThemeSettings();
                     break;
                 default:

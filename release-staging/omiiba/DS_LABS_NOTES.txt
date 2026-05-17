@@ -1,0 +1,37 @@
+Omiiba3DS DS Labs notes
+=======================
+
+Stable path: TWiLight Menu++ / nds-bootstrap
+--------------------------------------------
+
+Omiiba3DS does not bundle a DS ROM loader. For DS games from SD, use the
+community-standard TWiLight Menu++ and nds-bootstrap stack.
+
+Recommended DS ROM folder:
+
+  SD:/roms/nds/
+
+Common TWiLight/nds-bootstrap paths checked by Omiiba diagnostics:
+
+  SD:/_nds/
+  SD:/_nds/TWiLightMenu/
+  SD:/_nds/nds-bootstrap-release.nds
+  SD:/_nds/nds-bootstrap.nds
+  SD:/_nds/TWiLightMenu/extras/usrcheat.dat
+
+TWL filter status
+-----------------
+
+Omiiba3DS already has a TWL_FIRM filter hook inherited from Luma3DS. When the
+Advanced setting "Enable DSi external filter" is enabled, Omiiba tries to patch
+TwlBg with:
+
+  SD:/omiiba/twl_upscaling_filter.bin
+
+This affects DS(i)/TWL software, not GBA/open_agb_firm. DS Labs only checks and
+documents this path; it does not generate custom filter binaries yet.
+
+Safety
+------
+
+DS Labs diagnostics are read-only. They do not write to NAND or SD.

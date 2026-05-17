@@ -20,7 +20,7 @@ This fork is **not** affiliated with, endorsed by, or supported by LumaTeam.
 
 ## Summary of changes vs. upstream Luma3DS
 
-Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** and **2026-05-17** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, v1.3.4 splash readability, v1.4.0 Omiiba Boot Hub, v1.4.1 fast Boot Hub exit, v1.4.2 Hub-first polish, v1.4.3 GBA Labs, **v1.4.4** GBA display presets).
+Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** and **2026-05-17** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, v1.3.4 splash readability, v1.4.0 Omiiba Boot Hub, v1.4.1 fast Boot Hub exit, v1.4.2 Hub-first polish, v1.4.3 GBA Labs, **v1.4.4** GBA display presets and DS Labs).
 
 The following modifications were made to the upstream Luma3DS source tree.
 Almost every source file received the rebrand replacements; only the most
@@ -131,6 +131,10 @@ significant functional changes are listed individually.
   at `/omiiba/payloads/open_agb_firm.firm`, plus its `gba_db.bin` at
   `/3ds/open_agb_firm/gba_db.bin`. License files, upstream README, source link
   and bundle notice are shipped under `THIRD_PARTY/open_agb_firm/`.
+- **DS Labs** (`arm9/source/config.c`): the Boot Hub now includes a read-only
+  DS Labs menu for TWiLight Menu++ / nds-bootstrap setup guidance. It checks
+  recommended DS ROM and TWiLight paths, optional cheat database placement, and
+  the existing TWL external filter file `/omiiba/twl_upscaling_filter.bin`.
 - `arm9/source/main.c`: **No LCD power-down before `launchFirm()`.** Upstream
   Luma called `deinitScreens()` here, which blanks the panel until the OS
   redraws; Omiiba3DS omits that so the last splash frame stays visible
