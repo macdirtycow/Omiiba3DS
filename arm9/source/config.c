@@ -1748,13 +1748,6 @@ static void runOmiibaSetupWizard(MultiOptionState *multiOptions, SingleOptionSta
                        "enable", "skip"))
         singleOptions[PATCHGAMES].enabled = true;
 
-    if(askBootHubYesNo("External FIRMs/modules",
-                       "Enable external FIRMs and modules?\n\n"
-                       "Most users do not need this. Enable only\n"
-                       "if your setup uses external system files.",
-                       "enable", "skip"))
-        singleOptions[LOADEXTFIRMSANDMODULES].enabled = true;
-
     drawBootHubMessage("GodMode9",
                        "For maintenance tools, place GodMode9 at:\n"
                        "SD:/omiiba/payloads/GodMode9.firm\n\n"
@@ -1773,7 +1766,6 @@ static void applyDefaultProfile(MultiOptionState *multiOptions, SingleOptionStat
     multiOptions[NEWCPU].enabled = 0;
 
     singleOptions[PATCHGAMES].enabled = true;
-    singleOptions[LOADEXTFIRMSANDMODULES].enabled = false;
     singleOptions[REDIRECTAPPTHREADS].enabled = false;
 }
 
@@ -1784,7 +1776,6 @@ static void applySafeProfile(MultiOptionState *multiOptions, SingleOptionState *
     multiOptions[NEWCPU].enabled = 0;
 
     singleOptions[PATCHGAMES].enabled = false;
-    singleOptions[LOADEXTFIRMSANDMODULES].enabled = false;
     singleOptions[REDIRECTAPPTHREADS].enabled = false;
 }
 
@@ -1805,7 +1796,6 @@ static void applyModdingProfile(MultiOptionState *multiOptions, SingleOptionStat
     multiOptions[BRIGHTNESS].enabled = 0;
 
     singleOptions[PATCHGAMES].enabled = true;
-    singleOptions[LOADEXTFIRMSANDMODULES].enabled = false;
     singleOptions[REDIRECTAPPTHREADS].enabled = false;
 }
 
@@ -1817,7 +1807,6 @@ static void applyDeveloperProfile(MultiOptionState *multiOptions, SingleOptionSt
         multiOptions[NEWCPU].enabled = 1;
 
     singleOptions[PATCHGAMES].enabled = true;
-    singleOptions[LOADEXTFIRMSANDMODULES].enabled = true;
     singleOptions[REDIRECTAPPTHREADS].enabled = ISN3DS;
 }
 
@@ -1837,13 +1826,11 @@ static void runOmiibaProfiles(MultiOptionState *multiOptions, SingleOptionState 
         "- Splash before payloads\n"
         "- Brightness level 3\n"
         "- Game patching on\n"
-        "- External FIRMs off\n"
         "- CPU tweaks off",
 
         "Maximum compatibility:\n"
         "- Splash before payloads\n"
         "- Game patching off\n"
-        "- External FIRMs off\n"
         "- CPU/thread tweaks off",
 
         "Performance-oriented:\n"
@@ -1855,12 +1842,10 @@ static void runOmiibaProfiles(MultiOptionState *multiOptions, SingleOptionState 
         "Modding/plugin setup:\n"
         "- Bright splash before payloads\n"
         "- Game patching on\n"
-        "- External FIRMs off\n"
         "- CPU/thread tweaks off",
 
         "Developer setup:\n"
         "- Game patching on\n"
-        "- External FIRMs/modules on\n"
         "- New 3DS clock mode (N3DS only)\n"
         "- App syscore redirect (N3DS only)",
 

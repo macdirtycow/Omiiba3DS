@@ -91,8 +91,8 @@ significant functional changes are listed individually.
   it does not perform NAND writes or key/title decryption.
 - **Setup wizard** (`arm9/source/config.c`): a guided first-boot / on-demand
   flow for safe Omiiba defaults. It can enable splash-before-payloads, set a
-  bright boot-menu brightness level, enable game patching, optionally enable
-  external FIRMs/modules, and explain GodMode9 placement. Completion is tracked
+  bright boot-menu brightness level, enable game patching, and explain GodMode9
+  placement. Completion is tracked
   with `/omiiba/.setup_wizard_done`.
 - **Read-only diagnostics** (`arm9/source/config.c`): Boot Hub diagnostics now
   check config presence, GodMode9 payload presence, the bundled GM9 system-save
