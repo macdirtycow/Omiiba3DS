@@ -1,0 +1,10 @@
+This is a safe Omiiba3DS VC Patch Helper template.
+
+Rename the parent folder:
+
+  SD:/omiiba/titles/0004000000000000/
+
+to the real 16-digit title ID of the Virtual Console title you want to patch.
+Then place LayeredFS replacement files under this romfs folder.
+
+This placeholder title ID is intentionally not a real game target.

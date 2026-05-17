@@ -20,7 +20,7 @@ This fork is **not** affiliated with, endorsed by, or supported by LumaTeam.
 
 ## Summary of changes vs. upstream Luma3DS
 
-Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** and **2026-05-17** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, v1.3.4 splash readability, v1.4.0 Omiiba Boot Hub, v1.4.1 fast Boot Hub exit, v1.4.2 Hub-first polish, v1.4.3 GBA Labs, **v1.4.4** GBA display presets and DS Labs).
+Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** and **2026-05-17** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, v1.3.4 splash readability, v1.4.0 Omiiba Boot Hub, v1.4.1 fast Boot Hub exit, v1.4.2 Hub-first polish, v1.4.3 GBA Labs, v1.4.4 GBA display presets and DS Labs, **v1.4.5** VC Patch Helper and GBA VC research).
 
 The following modifications were made to the upstream Luma3DS source tree.
 Almost every source file received the rebrand replacements; only the most
@@ -124,8 +124,10 @@ significant functional changes are listed individually.
   to `/3ds/open_agb_firm/config.ini` for scaler, color profile, backlight,
   contrast, brightness and saturation values. The same menu documents AGB_FIRM
   scaling/filter and color-preset work as research only until safe display
-  patch points are verified. Diagnostics also report whether `open_agb_firm`,
-  `gba_db.bin` and open_agb_firm config are present.
+  patch points are verified. It also includes a GBA VC patch research submenu
+  that writes SD-only research notes without applying unverified display byte
+  patches. Diagnostics also report whether `open_agb_firm`, `gba_db.bin` and
+  open_agb_firm config are present.
 - **Bundled third-party payload**: release archives include the unmodified
   official `open_agb_firm` beta_2024-12-24 payload by profi200 and contributors
   at `/omiiba/payloads/open_agb_firm.firm`, plus its `gba_db.bin` at
@@ -139,6 +141,11 @@ significant functional changes are listed individually.
   official TWiLight Menu++ v27.23.0 3DS package and bundled nds-bootstrap
   v2.15.0. License files, upstream READMEs, source links and bundle notices are
   shipped under `THIRD_PARTY/TWiLightMenu/` and `THIRD_PARTY/nds-bootstrap/`.
+- **VC Patch Helper** (`arm9/source/config.c`): the Boot Hub now includes a
+  helper for existing title-based game patching. It checks `PATCHGAMES`, creates
+  `SD:/omiiba/titles/0004000000000000/romfs/` as a safe template, writes
+  `SD:/omiiba/VC_PATCH_HELP.txt`, and documents `code.ips`, `code.bps`,
+  `code.bin`, `exheader.bin`, `locale.txt`, and LayeredFS `romfs/` layouts.
 - `arm9/source/main.c`: **No LCD power-down before `launchFirm()`.** Upstream
   Luma called `deinitScreens()` here, which blanks the panel until the OS
   redraws; Omiiba3DS omits that so the last splash frame stays visible
@@ -146,7 +153,7 @@ significant functional changes are listed individually.
 
 ### Versioning
 - `arm9/Makefile` no longer derives the version from upstream Luma git
-  tags. Hardcoded default is `1.4.4`, override with
+  tags. Hardcoded default is `1.4.5`, override with
   `make VERSION_MAJOR=… VERSION_MINOR=… VERSION_BUILD=…`.
 
 ### Buffer fixes related to the longer `/omiiba` prefix

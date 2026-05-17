@@ -1203,6 +1203,160 @@ static void applyOpenAgbDisplayPreset(const OpenAgbDisplayPreset *preset)
     }
 }
 
+static void writeVcPatchHelpFile(void)
+{
+    static const char helpText[] =
+        "Omiiba3DS VC Patch Helper\n"
+        "=========================\n\n"
+        "Enable game patching in Omiiba/Luma settings first.\n\n"
+        "Per-title patch root:\n"
+        "  SD:/omiiba/titles/<16-digit TITLEID>/\n\n"
+        "Supported files/folders:\n"
+        "  code.ips       IPS code patch\n"
+        "  code.bps       BPS code patch\n"
+        "  code.bin       decompressed replacement ExeFS code\n"
+        "  exheader.bin   decrypted replacement exheader\n"
+        "  locale.txt     region/language override\n"
+        "  romfs/         LayeredFS file replacement folder\n\n"
+        "Virtual Console notes:\n"
+        "  NES/SNES/GB/GBC VC titles can use normal title patching.\n"
+        "  GBA VC runs under AGB_FIRM; display scaling/color patches need\n"
+        "  separate AGB_FIRM research and are not enabled by this helper.\n";
+
+    f_mkdir("sdmc:/omiiba");
+    fileWrite(helpText, "sdmc:/omiiba/VC_PATCH_HELP.txt", sizeof(helpText) - 1);
+}
+
+static void createVcPatchFolders(void)
+{
+    f_mkdir("sdmc:/omiiba");
+    f_mkdir("sdmc:/omiiba/titles");
+    f_mkdir("sdmc:/omiiba/titles/0004000000000000");
+    f_mkdir("sdmc:/omiiba/titles/0004000000000000/romfs");
+    writeVcPatchHelpFile();
+}
+
+static void launchVcPatchHelper(void)
+{
+    static const char *items[] = {
+        "VC patch status",
+        "Create patch folders",
+        "Patch file layout",
+        "GBA VC warning",
+        "Back to Boot Hub",
+    };
+
+    static const char *descriptions[] = {
+        "Check whether game patching is enabled\n"
+        "and whether /omiiba/titles exists.",
+        "Create a safe template at:\n\n"
+        "SD:/omiiba/titles/0004000000000000/romfs/\n\n"
+        "Rename the title ID folder to the real\n"
+        "16-digit Virtual Console title ID.",
+        "Omiiba title patch layout:\n\n"
+        "code.ips / code.bps / code.bin\n"
+        "exheader.bin / locale.txt / romfs/",
+        "GBA VC injects run under AGB_FIRM.\n\n"
+        "Normal title patches can affect the title,\n"
+        "but display scaling/color needs separate\n"
+        "AGB_FIRM patch research.",
+        "Return to the Omiiba Boot Hub.",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "VC Patch Helper");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: Boot Hub");
+        drawString(true, 10, 10 + 2 * SPACING_Y, COLOR_WHITE, "LayeredFS / IPS / BPS setup helper");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (4 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE, descriptions[selectedItem]);
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            if(selectedItem == 0)
+            {
+                clearScreens(false);
+                drawString(true, 10, 10, COLOR_TITLE, "VC patch status");
+                drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "Read-only title patch checks");
+
+                drawFormattedString(true, 10, 10 + 3 * SPACING_Y, COLOR_WHITE,
+                                    "Game patching: %s", onOff(CONFIG(PATCHGAMES)));
+                drawFormattedString(true, 10, 10 + 4 * SPACING_Y, COLOR_WHITE,
+                                    "Patch root: %s", directoryExists("sdmc:/omiiba/titles") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 5 * SPACING_Y, COLOR_WHITE,
+                                    "Template folder: %s", directoryExists("sdmc:/omiiba/titles/0004000000000000") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 6 * SPACING_Y, COLOR_WHITE,
+                                    "Template romfs: %s", directoryExists("sdmc:/omiiba/titles/0004000000000000/romfs") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 7 * SPACING_Y, COLOR_WHITE,
+                                    "Help file: %s", getFileSize("sdmc:/omiiba/VC_PATCH_HELP.txt") > 0 ? "found" : "missing");
+
+                drawString(false, 10, 10, COLOR_WHITE,
+                           "Use a real 16-digit title ID folder for\n"
+                           "actual patches. The template folder is\n"
+                           "only a safe starting point.\n\n"
+                           "Press A/B/START to return.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == 1)
+            {
+                createVcPatchFolders();
+                drawBootHubMessage("VC Patch Helper",
+                                   "Created/checked patch helper files:\n\n"
+                                   "SD:/omiiba/titles/\n"
+                                   "SD:/omiiba/titles/0004000000000000/romfs/\n"
+                                   "SD:/omiiba/VC_PATCH_HELP.txt\n\n"
+                                   "Rename the template folder to a real\n"
+                                   "16-digit Virtual Console title ID.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == itemAmount - 1)
+                return;
+            else
+            {
+                drawBootHubMessage("VC Patch Helper", descriptions[selectedItem]);
+                waitForBootHubBack();
+            }
+        }
+    }
+}
+
 static void launchOpenAgbDisplayPresets(void)
 {
     const u32 presetAmount = sizeof(openAgbDisplayPresets) / sizeof(openAgbDisplayPresets[0]);
@@ -1289,11 +1443,147 @@ static void launchOpenAgbDisplayPresets(void)
     }
 }
 
+static void writeGbaVcResearchFile(void)
+{
+    static const char researchText[] =
+        "Omiiba3DS GBA VC Patch Research\n"
+        "===============================\n\n"
+        "Current safe AGB_FIRM patch point:\n"
+        "  Show GBA boot screen in patched AGB_FIRM\n\n"
+        "Not enabled yet:\n"
+        "  Forced GBA VC scaling filters\n"
+        "  Forced GBA VC color/brightness presets\n\n"
+        "Reason:\n"
+        "  GBA Virtual Console injects run under AGB_FIRM legacy mode.\n"
+        "  Omiiba currently has patchAgbFirm() and patchAgbBootSplash(),\n"
+        "  but no verified AgbBg/display-driver patch point for color or\n"
+        "  scaling. Enabling blind byte patches here could black-screen.\n\n"
+        "Safe current recommendation:\n"
+        "  Use open_agb_firm for SD-card GBA games and Omiiba display presets.\n"
+        "  Keep VC inject display patching in alpha research until verified.\n";
+
+    f_mkdir("sdmc:/omiiba");
+    f_mkdir("sdmc:/omiiba/agb_vc_research");
+    fileWrite(researchText, "sdmc:/omiiba/agb_vc_research/README.txt", sizeof(researchText) - 1);
+}
+
+static void launchGbaVcPatchResearch(void)
+{
+    static const char *items[] = {
+        "Patch point status",
+        "Create research notes",
+        "Display patch warning",
+        "Back to GBA Labs",
+    };
+
+    static const char *descriptions[] = {
+        "Show the safe AGB_FIRM patch status\n"
+        "that Omiiba can currently verify.",
+        "Create SD:/omiiba/agb_vc_research/README.txt\n"
+        "with current GBA VC research notes.",
+        "GBA VC scaling/color patches are not\n"
+        "enabled until a verified AgbBg/display\n"
+        "patch point is known for hardware tests.",
+        "Return to GBA Labs.",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "GBA VC research");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: GBA Labs");
+        drawString(true, 10, 10 + 2 * SPACING_Y, COLOR_WHITE, "AGB_FIRM display patch prototype area");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (4 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE, descriptions[selectedItem]);
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            if(selectedItem == 0)
+            {
+                clearScreens(false);
+                drawString(true, 10, 10, COLOR_TITLE, "AGB patch status");
+                drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "Read-only research checks");
+
+                drawFormattedString(true, 10, 10 + 3 * SPACING_Y, COLOR_WHITE,
+                                    "GBA boot splash patch: %s", onOff(CONFIG(SHOWGBABOOT)));
+                drawString(true, 10, 10 + 4 * SPACING_Y, COLOR_WHITE,
+                           "AGB display patch: research only");
+                drawFormattedString(true, 10, 10 + 5 * SPACING_Y, COLOR_WHITE,
+                                    "Research folder: %s", directoryExists("sdmc:/omiiba/agb_vc_research") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 6 * SPACING_Y, COLOR_WHITE,
+                                    "Research notes: %s", getFileSize("sdmc:/omiiba/agb_vc_research/README.txt") > 0 ? "found" : "missing");
+
+                drawString(false, 10, 10, COLOR_WHITE,
+                           "This screen deliberately does not patch\n"
+                           "GBA VC display registers yet.\n\n"
+                           "It tracks the alpha research state so\n"
+                           "we avoid unsafe black-screen builds.\n\n"
+                           "Press A/B/START to return.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == 1)
+            {
+                writeGbaVcResearchFile();
+                drawBootHubMessage("GBA VC research",
+                                   "Created research notes at:\n\n"
+                                   "SD:/omiiba/agb_vc_research/README.txt\n\n"
+                                   "Display scaling/color patching remains\n"
+                                   "research until a patch point is verified.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == itemAmount - 1)
+                return;
+            else
+            {
+                drawBootHubMessage("GBA VC research", descriptions[selectedItem]);
+                waitForBootHubBack();
+            }
+        }
+    }
+}
+
 static void launchGbaLabs(void)
 {
     static const char *items[] = {
         "Start open_agb_firm",
         "Display presets",
+        "GBA VC patch research",
         "open_agb_firm setup help",
         "GBA display notes",
         "AGB_FIRM scaling filters: research",
@@ -1308,6 +1598,9 @@ static void launchGbaLabs(void)
         "Write /3ds/open_agb_firm/config.ini\n"
         "with scaler, color, brightness and battery\n"
         "presets before launching open_agb_firm.",
+        "Prototype area for GBA Virtual Console\n"
+        "patch-point tracking and research notes.\n\n"
+        "No unsafe display byte patches are applied.",
         "Place open_agb_firm at:\n\n"
         "SD:/omiiba/payloads/open_agb_firm.firm\n\n"
         "v1.4.4 release zips bundle it together\n"
@@ -1387,6 +1680,8 @@ static void launchGbaLabs(void)
             }
             else if(selectedItem == 1)
                 launchOpenAgbDisplayPresets();
+            else if(selectedItem == 2)
+                launchGbaVcPatchResearch();
             else if(selectedItem == itemAmount - 1)
                 return;
             else
@@ -1601,6 +1896,12 @@ static void showBootHubDiagnostics(void)
                         "EmuNAND: %s", emuNandType == FIRMWARE_EMUNAND ? "detected" : "not detected");
     drawFormattedString(true, 10, 10 + 19 * SPACING_Y, COLOR_WHITE,
                         "Splash: %s", splashMode);
+    drawFormattedString(true, 10, 10 + 20 * SPACING_Y, COLOR_WHITE,
+                        "Game patching: %s", onOff(CONFIG(PATCHGAMES)));
+    drawFormattedString(true, 10, 10 + 21 * SPACING_Y, COLOR_WHITE,
+                        "VC patch root: %s", directoryExists("sdmc:/omiiba/titles") ? "found" : "missing");
+    drawFormattedString(true, 10, 10 + 22 * SPACING_Y, COLOR_WHITE,
+                        "GBA VC research: %s", getFileSize("sdmc:/omiiba/agb_vc_research/README.txt") > 0 ? "found" : "missing");
 
     drawString(false, 10, 10, COLOR_WHITE,
                "Diagnostics only reads files, folders and\n"
@@ -2119,6 +2420,7 @@ static BootHubResult omiibaBootHub(void)
         "GodMode9 tools",
         "GBA Labs",
         "DS Labs",
+        "VC Patch Helper",
         "Diagnostics",
         "Profiles",
         "Payload manager",
@@ -2137,6 +2439,7 @@ static BootHubResult omiibaBootHub(void)
         "Launch GodMode9 from /omiiba/payloads.\n\nLow-level dumping remains delegated to GodMode9.",
         "Launch open_agb_firm and view experimental\nGBA display research notes.",
         "Check TWiLight/nds-bootstrap folders,\nDS ROM path and TWL filter setup.",
+        "Create /omiiba/titles patch folders\nand view VC LayeredFS/IPS guidance.",
         "Show safe read-only checks for Omiiba setup health.",
         "Apply named safe setting groups:\nDefault, Safe, Performance, Modding, Dev.",
         "List payloads, launch selected .firm files\nand create safe hotkey copies.",
@@ -2212,14 +2515,17 @@ static BootHubResult omiibaBootHub(void)
                     launchDsLabs();
                     break;
                 case 7:
-                    showBootHubDiagnostics();
+                    launchVcPatchHelper();
                     break;
                 case 8:
-                    return BOOT_HUB_RUN_PROFILES;
+                    showBootHubDiagnostics();
+                    break;
                 case 9:
+                    return BOOT_HUB_RUN_PROFILES;
+                case 10:
                     runPayloadManager();
                     break;
-                case 10:
+                case 11:
                     runThemeSettings();
                     break;
                 default:

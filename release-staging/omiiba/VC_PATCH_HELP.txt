@@ -1,0 +1,29 @@
+Omiiba3DS VC Patch Helper
+=========================
+
+Enable game patching in Omiiba/Luma settings first.
+
+Per-title patch root:
+
+  SD:/omiiba/titles/<16-digit TITLEID>/
+
+Supported files and folders:
+
+  code.ips       IPS code patch
+  code.bps       BPS code patch
+  code.bin       decompressed replacement ExeFS code
+  exheader.bin   decrypted replacement exheader
+  locale.txt     region/language override
+  romfs/         LayeredFS file replacement folder
+
+Virtual Console notes:
+
+- NES/SNES/GB/GBC VC titles can use normal title patching.
+- GBA VC injects run under AGB_FIRM legacy mode.
+- GBA VC display scaling/color patches need separate AGB_FIRM research.
+
+The release includes a safe template folder:
+
+  SD:/omiiba/titles/0004000000000000/romfs/
+
+Rename the 16-digit folder to the real title ID before using it.

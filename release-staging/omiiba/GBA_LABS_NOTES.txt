@@ -63,6 +63,8 @@ Current Omiiba3DS research findings:
 
 - TWL_FIRM has an existing TwlBg upscaling filter replacement path.
 - AGB_FIRM currently only has a known boot-splash patch in this codebase.
+- GBA Labs now includes a "GBA VC patch research" submenu which shows the
+  current safe patch status and can create SD:/omiiba/agb_vc_research/README.txt.
 - The next real VC-inject research step is finding AgbBg/display-driver
   constants or tables, not trying to apply Rosalina live filters.
 - Scaling/filter changes for VC injects need a verified AGB_FIRM display-driver
