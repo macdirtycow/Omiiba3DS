@@ -2,7 +2,15 @@ Omiiba3DS OTA Update Notes
 ==========================
 
 Phase 1 uses Universal-Updater instead of putting networking inside the arm9
-bootloader.
+bootloader. Phase 2 adds a bundled Omiiba Updater 3DSX app.
+
+Bundled updater app:
+
+  SD:/3ds/OmiibaUpdater/OmiibaUpdater.3dsx
+
+The app downloads the latest boot.firm asset directly from:
+
+  https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/boot.firm
 
 Bundled store file:
 

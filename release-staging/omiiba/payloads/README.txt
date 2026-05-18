@@ -62,9 +62,13 @@ For wireless update/FTP helper folders, open:
 Omiiba Boot Hub -> Wireless Tools
 
 Recommended app paths:
+SD:/3ds/OmiibaUpdater/OmiibaUpdater.3dsx
 SD:/cias/Universal-Updater.cia
 SD:/3ds/Universal-Updater/stores/omiiba.unistore
 SD:/3ds/ftpd/ftpd.3dsx
+
+For direct Omiiba OTA updates:
+Homebrew Launcher -> OmiibaUpdater -> A to install latest boot.firm
 
 For Omiiba OTA updates:
 Open Universal-Updater -> Omiiba3DS store -> Install latest Omiiba3DS boot.firm

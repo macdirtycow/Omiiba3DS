@@ -63,7 +63,7 @@ The Hub groups Omiiba-specific shortcuts such as GodMode9 tools, GBA Labs, DS La
 
 **VC Patch Helper workflow:** for NES/SNES/GB/GBC and other normal title-based Virtual Console patches, use **Omiiba Boot Hub** → **VC Patch Helper** to check whether game patching is enabled, create `SD:/omiiba/titles/0004000000000000/romfs/`, and write `SD:/omiiba/VC_PATCH_HELP.txt`. Rename the template folder to the real 16-digit title ID and place `code.ips`, `code.bps`, `code.bin`, `exheader.bin`, `locale.txt`, or `romfs/` replacements there. GBA VC display scaling/color remains separate AGB_FIRM research; GBA Labs includes a research submenu but does not apply unsafe display byte patches.
 
-**Wireless Tools / OTA workflow:** because the arm9 boot menu is not a safe place to run a full Wi-Fi downloader or FTP server, **Wireless Tools** prepares and checks the standard app paths instead: `SD:/cias/Universal-Updater.cia`, `SD:/3ds/Universal-Updater/stores/omiiba.unistore`, and `SD:/3ds/ftpd/ftpd.3dsx`. Use Universal-Updater from HOME Menu to open the bundled Omiiba3DS store and install the latest `boot.firm` from GitHub releases; use ftpd from Homebrew Launcher for wireless file transfer.
+**Wireless Tools / OTA workflow:** because the arm9 boot menu is not a safe place to run a full Wi-Fi downloader or FTP server, **Wireless Tools** prepares and checks the standard app paths instead: `SD:/3ds/OmiibaUpdater/OmiibaUpdater.3dsx`, `SD:/cias/Universal-Updater.cia`, `SD:/3ds/Universal-Updater/stores/omiiba.unistore`, and `SD:/3ds/ftpd/ftpd.3dsx`. Use the bundled Omiiba Updater app from Homebrew Launcher for direct latest `boot.firm` installs, or use Universal-Updater from HOME Menu to open the bundled Omiiba3DS store; use ftpd from Homebrew Launcher for wireless file transfer.
 
 **The chainloader menu** is accessed by pressing <kbd>Start</kbd> at boot, or from the configuration menu. Payloads are expected to be located in `/omiiba/payloads` with the `.firm` extension; if there is only one such payload, the aforementionned selection menu will be skipped. Hotkeys can be assigned to payload, for example `x_test.firm` will be chainloaded when <kbd>X</kbd> is pressed at boot.
 
@@ -81,7 +81,7 @@ Everything in the *Description* section above was already present in upstream Lu
 * The on-card data folder moved from `/luma` to `/omiiba`, with an automatic one-shot migration on first boot
 * A custom textual coldboot splash screen (existing `splash.bin` / `splashbottom.bin` files keep working)
 * Rosalina overlay menu retitled "Cow menu" with a burnt-orange / amber-brown title color (`#CC6600`)
-* Hardcoded version `v1.4.7` (no longer derived from upstream Luma git tags)
+* Hardcoded version `v1.4.8` (no longer derived from upstream Luma git tags)
 * Optional one-line tagline from `/omiiba/boot_message.txt` shown on the boot splash
 * Rotating "Cow tip" on the bottom splash (state in `/omiiba/.cow_tip_state`)
 * **Cold-boot splash:** dark panels and accent bars, 2× scaled `OMIIBA3DS` logo, readable muted text, rotating tips kept inside the bottom card (wrapped when needed)
@@ -95,7 +95,7 @@ Everything in the *Description* section above was already present in upstream Lu
 * **DS Labs:** bundled TWiLight Menu++ / nds-bootstrap setup checks, `SD:/TWiLight Menu.cia` install guidance, recommended `SD:/roms/nds/` folder creation and TWL external filter help
 * **DS Widescreen Labs:** Boot Hub manager for TWL external filter status/toggle, widescreen notes, TWiLight compatibility list checks, and DS ROM/helper folder setup
 * **VC Patch Helper:** creates the `/omiiba/titles/` title-patching template, documents supported LayeredFS/IPS/BPS file layouts, and keeps GBA VC display patches marked as AGB_FIRM research
-* **Wireless Tools / OTA:** prepares `SD:/cias/`, `SD:/3ds/Universal-Updater/stores/`, and `SD:/3ds/ftpd/` paths, bundles an Omiiba Universal-Updater store, and documents the safe GitHub-release OTA workflow instead of attempting risky bootloader networking
+* **Wireless Tools / OTA:** prepares `SD:/3ds/OmiibaUpdater/`, `SD:/cias/`, `SD:/3ds/Universal-Updater/stores/`, and `SD:/3ds/ftpd/` paths, bundles an Omiiba Universal-Updater store and a dedicated Omiiba Updater 3DSX app, and documents the safe GitHub-release OTA workflow instead of attempting risky bootloader networking
 * A few helper build scripts under `scripts/`
 
 For the full per-file change list, see [`NOTICE-OMIIBA.md`](NOTICE-OMIIBA.md).

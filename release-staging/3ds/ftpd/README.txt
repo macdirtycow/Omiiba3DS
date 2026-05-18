@@ -10,3 +10,7 @@ Omiiba Wireless Tools checks this path but does not bundle ftpd.
 For Omiiba OTA firmware updates, use Universal-Updater with:
 
   SD:/3ds/Universal-Updater/stores/omiiba.unistore
+
+Or launch the dedicated updater app:
+
+  SD:/3ds/OmiibaUpdater/OmiibaUpdater.3dsx

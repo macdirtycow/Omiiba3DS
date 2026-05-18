@@ -5,7 +5,7 @@
         "description": "OTA updates for Omiiba3DS boot.firm from GitHub releases",
         "url": "https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/omiiba.unistore",
         "file": "omiiba.unistore",
-        "revision": 147,
+        "revision": 148,
         "version": 4
     },
     "storeContent": [
@@ -18,12 +18,12 @@
                 "console": ["3DS"],
                 "last_updated": "2026-05-18 at 14:00 (UTC)",
                 "license": "gpl-3.0",
-                "version": "v1.4.7"
+                "version": "v1.4.8"
             },
             "Install latest Omiiba3DS boot.firm": [
                 {
                     "type": "downloadFile",
-                    "file": "https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.7.zip",
+                    "file": "https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.8.zip",
                     "message": "Downloading latest Omiiba3DS release zip...",
                     "output": "sdmc:/omiiba/update/Omiiba3DS-latest.zip"
                 },
@@ -43,9 +43,9 @@
             "Download full release zip only": [
                 {
                     "type": "downloadFile",
-                    "file": "https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.7.zip",
+                    "file": "https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.8.zip",
                     "message": "Downloading full Omiiba3DS release zip...",
-                    "output": "sdmc:/omiiba/update/Omiiba3DS-v1.4.7.zip"
+                    "output": "sdmc:/omiiba/update/Omiiba3DS-v1.4.8.zip"
                 }
             ]
         }

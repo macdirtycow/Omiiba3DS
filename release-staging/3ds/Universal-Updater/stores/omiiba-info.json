@@ -4,6 +4,6 @@
     "description": "OTA updates for Omiiba3DS boot.firm from GitHub releases",
     "url": "https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/omiiba.unistore",
     "file": "omiiba.unistore",
-    "revision": 147,
+    "revision": 148,
     "version": 4
 }
