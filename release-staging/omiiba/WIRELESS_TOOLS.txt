@@ -1,0 +1,18 @@
+Omiiba3DS Wireless Tools
+========================
+
+Omiiba's arm9 boot menu cannot safely run a full Wi-Fi downloader or FTP server
+before HOME Menu services are available. Instead, this helper prepares the SD
+layout for the tools users normally install manually.
+
+Recommended apps:
+
+  Universal-Updater CIA -> SD:/cias/Universal-Updater.cia
+  ftpd 3DSX             -> SD:/3ds/ftpd/ftpd.3dsx
+
+Use Universal-Updater from HOME Menu to update homebrew over Wi-Fi.
+Use ftpd from Homebrew Launcher to copy files without removing the SD card.
+
+Boot path:
+
+  Omiiba Boot Hub -> Wireless Tools

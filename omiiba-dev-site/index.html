@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Omiiba3DS - A friendlier 3DS boot experience</title>
-  <meta name="description" content="Omiiba3DS is an unofficial educational Luma3DS fork focused on a clearer boot menu, guided setup, diagnostics, GBA Labs, bundled DS Labs, VC patch helpers, payload tools, and GodMode9 handoff.">
+  <meta name="description" content="Omiiba3DS is an unofficial educational Luma3DS fork focused on a clearer boot menu, DS Widescreen Labs, GBA Labs, bundled DS Labs, VC patch helpers, Wireless Tools, and GodMode9 handoff.">
   <meta property="og:title" content="Omiiba3DS">
   <meta property="og:description" content="A friendlier Nintendo 3DS boot experience, based on Luma3DS.">
   <meta property="og:type" content="website">
@@ -44,7 +44,7 @@
           and setting up retro handheld workflows from one readable startup hub.
         </p>
         <div class="actions">
-          <a class="button primary" href="https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.5.zip">Download v1.4.5 alpha</a>
+          <a class="button primary" href="https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.6.zip">Download v1.4.6 alpha</a>
           <a class="button secondary" href="https://github.com/macdirtycow/Omiiba3DS/releases/latest">View release</a>
         </div>
         <p class="fine-print">
@@ -53,7 +53,7 @@
           or endorsed by LumaTeam.
         </p>
         <div class="hero-stats" aria-label="Project highlights">
-          <div><strong>v1.4.5</strong><span>alpha release</span></div>
+          <div><strong>v1.4.6</strong><span>alpha release</span></div>
           <div><strong>SELECT</strong><span>opens Boot Hub</span></div>
           <div><strong>GPLv3</strong><span>source available</span></div>
         </div>
@@ -74,8 +74,8 @@
           <div class="screen-row">Setup wizard</div>
           <div class="screen-row">GBA Labs</div>
           <div class="screen-row">DS Labs</div>
+          <div class="screen-row">DS Widescreen Labs</div>
           <div class="screen-row">VC Patch Helper</div>
-          <div class="screen-row">Diagnostics</div>
           <div class="screen-row">Payload manager</div>
           <div class="screen-footer">SELECT at boot</div>
         </div>
@@ -104,8 +104,8 @@
         <p>
           Omiiba3DS keeps the trusted Luma3DS foundation, then adds a practical
           layer for day-to-day use: guided setup, launch shortcuts, readable
-          status checks, GBA display presets, bundled DS setup help, and VC
-          patch folder guidance.
+          status checks, GBA display presets, bundled DS setup help, DS
+          widescreen management, VC patch guidance, and wireless app setup.
         </p>
       </div>
       <div class="feature-grid">
@@ -124,6 +124,10 @@
         <article class="feature-card">
           <h3>Bundled DS Labs</h3>
           <p>The release includes TWiLight Menu++ files, checks the setup, creates the recommended DS ROM folder, and points users to the CIA install step.</p>
+        </article>
+        <article class="feature-card">
+          <h3>DS Widescreen Labs</h3>
+          <p>Toggle the TWL external filter setting, check the widescreen compatibility list, create setup notes, and prepare DS widescreen helper folders.</p>
         </article>
         <article class="feature-card">
           <h3>VC Patch Helper</h3>
@@ -201,7 +205,7 @@
       </div>
       <ol class="steps">
         <li>Use a Nintendo 3DS system that already has boot9strap installed.</li>
-        <li>Extract <code>Omiiba3DS-v1.4.5.zip</code> directly to the SD card root.</li>
+        <li>Extract <code>Omiiba3DS-v1.4.6.zip</code> directly to the SD card root.</li>
         <li>Hold <strong>SELECT</strong> while booting to open Omiiba Boot Hub.</li>
         <li>For DS games, install <code>SD:/TWiLight Menu.cia</code> with FBI after extraction.</li>
       </ol>
@@ -210,15 +214,15 @@
     <section id="release" class="section release">
       <div>
         <p class="eyebrow">Latest release</p>
-        <h2>v1.4.5 alpha</h2>
+        <h2>v1.4.6 alpha</h2>
         <p>
-          Version 1.4.5 adds a real VC Patch Helper for title-based patches,
-          creates safe Omiiba patch templates, and expands GBA Labs with a GBA
-          VC research area that tracks AGB_FIRM display work without enabling
-          unsafe byte patches.
+          Version 1.4.6 adds DS Widescreen Labs for TWL external filter setup,
+          compatibility checks, and helper notes. It also adds Wireless Tools
+          for Universal-Updater and ftpd folder preparation without risky
+          bootloader networking.
         </p>
       </div>
-      <a class="button primary" href="https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.5.zip">Download release zip</a>
+      <a class="button primary" href="https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.6.zip">Download release zip</a>
     </section>
   </main>
 

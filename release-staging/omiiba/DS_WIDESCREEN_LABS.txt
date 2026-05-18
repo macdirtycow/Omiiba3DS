@@ -1,0 +1,24 @@
+Omiiba3DS DS Widescreen Labs
+============================
+
+Omiiba can enable Luma/Omiiba's existing TWL external filter option.
+The filter binary must be placed here:
+
+  SD:/omiiba/twl_upscaling_filter.bin
+
+For TWiLight Menu++ widescreen, games also need compatible widescreen
+codes/settings through TWiLight/nds-bootstrap. The bundled TWiLight release
+includes this compatibility reference at SD root:
+
+  Games supported with widescreen.txt
+
+Important limits:
+
+- This is DS/TWL mode, not NATIVE_FIRM Rosalina live filtering.
+- Some games need per-game widescreen codes.
+- Some games do not support widescreen cleanly.
+- GBA VC display patches are separate AGB_FIRM research.
+
+Boot path:
+
+  Omiiba Boot Hub -> DS Widescreen Labs

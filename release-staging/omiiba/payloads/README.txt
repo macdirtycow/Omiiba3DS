@@ -43,6 +43,12 @@ SD:/roms/nds/
 Then hold SELECT at boot, open:
 Omiiba Boot Hub -> DS Labs
 
+For DS widescreen/TWL filter setup, open:
+Omiiba Boot Hub -> DS Widescreen Labs
+
+Active TWL filter path:
+SD:/omiiba/twl_upscaling_filter.bin
+
 For Virtual Console title patches, open:
 Omiiba Boot Hub -> VC Patch Helper
 
@@ -51,6 +57,13 @@ SD:/omiiba/titles/<16-digit TITLEID>/
 
 Supported helper layout:
 code.ips, code.bps, code.bin, exheader.bin, locale.txt, romfs/
+
+For wireless update/FTP helper folders, open:
+Omiiba Boot Hub -> Wireless Tools
+
+Recommended app paths:
+SD:/cias/Universal-Updater.cia
+SD:/3ds/ftpd/ftpd.3dsx
 
 For system save dumps, use the release zip's script:
 SD:/gm9/scripts/Omiiba_System_Save_Dump.gm9

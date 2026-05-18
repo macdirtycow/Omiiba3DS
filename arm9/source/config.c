@@ -1357,6 +1357,324 @@ static void launchVcPatchHelper(void)
     }
 }
 
+static void writeDsWidescreenNotes(void)
+{
+    static const char notes[] =
+        "Omiiba3DS DS Widescreen Labs\n"
+        "============================\n\n"
+        "Omiiba can enable Luma/Omiiba's existing TWL external filter option.\n"
+        "The filter binary must be placed here:\n\n"
+        "  SD:/omiiba/twl_upscaling_filter.bin\n\n"
+        "For TWiLight Menu++ widescreen, games also need compatible widescreen\n"
+        "codes/settings through TWiLight/nds-bootstrap. The bundled TWiLight\n"
+        "release includes this compatibility reference at SD root:\n\n"
+        "  Games supported with widescreen.txt\n\n"
+        "Important limits:\n"
+        "- This is DS/TWL mode, not NATIVE_FIRM Rosalina live filtering.\n"
+        "- Some games need per-game widescreen codes.\n"
+        "- Some games do not support widescreen cleanly.\n"
+        "- GBA VC display patches are separate AGB_FIRM research.\n";
+
+    f_mkdir("sdmc:/omiiba");
+    f_mkdir("sdmc:/omiiba/twl_filters");
+    fileWrite(notes, "sdmc:/omiiba/DS_WIDESCREEN_LABS.txt", sizeof(notes) - 1);
+}
+
+static void createDsWidescreenSetup(void)
+{
+    f_mkdir("sdmc:/omiiba");
+    f_mkdir("sdmc:/omiiba/twl_filters");
+    f_mkdir("sdmc:/roms");
+    f_mkdir("sdmc:/roms/nds");
+    writeDsWidescreenNotes();
+}
+
+static bool launchDsWidescreenLabs(bool *twlExternalFilterEnabled)
+{
+    static const char *items[] = {
+        "Widescreen status",
+        "Enable TWL external filter",
+        "Disable TWL external filter",
+        "Create setup notes/folders",
+        "Compatibility notes",
+        "Back to Boot Hub",
+    };
+
+    static const char *descriptions[] = {
+        "Check TWiLight, widescreen reference,\n"
+        "TWL filter binary and current toggle.",
+        "Turn on the existing TWL external filter\n"
+        "setting for the next saved boot config.",
+        "Turn off the TWL external filter setting\n"
+        "if games misbehave or look wrong.",
+        "Create DS widescreen helper folders and\n"
+        "SD:/omiiba/DS_WIDESCREEN_LABS.txt.",
+        "DS widescreen needs both a TWL filter\n"
+        "binary and compatible per-game TWiLight\n"
+        "widescreen codes/settings.",
+        "Return to the Omiiba Boot Hub.",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+    bool changed = false;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "DS Widescreen Labs");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: Boot Hub");
+        drawString(true, 10, 10 + 2 * SPACING_Y, COLOR_WHITE, "TWL filter manager and widescreen setup");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (4 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE, descriptions[selectedItem]);
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return changed;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            if(selectedItem == 0)
+            {
+                clearScreens(false);
+                drawString(true, 10, 10, COLOR_TITLE, "DS widescreen status");
+                drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "Read-only TWL checks");
+
+                drawFormattedString(true, 10, 10 + 3 * SPACING_Y, COLOR_WHITE,
+                                    "TWL external filter: %s", onOff(*twlExternalFilterEnabled));
+                drawFormattedString(true, 10, 10 + 4 * SPACING_Y, COLOR_WHITE,
+                                    "Filter binary: %s", getFileSize("twl_upscaling_filter.bin") > 0 ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 5 * SPACING_Y, COLOR_WHITE,
+                                    "TWiLight _nds: %s", directoryExists("sdmc:/_nds/TWiLightMenu") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 6 * SPACING_Y, COLOR_WHITE,
+                                    "Widescreen list: %s", getFileSize("sdmc:/Games supported with widescreen.txt") > 0 ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 7 * SPACING_Y, COLOR_WHITE,
+                                    "DS ROM folder: %s", directoryExists("sdmc:/roms/nds") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 8 * SPACING_Y, COLOR_WHITE,
+                                    "Setup notes: %s", getFileSize("sdmc:/omiiba/DS_WIDESCREEN_LABS.txt") > 0 ? "found" : "missing");
+
+                drawString(false, 10, 10, COLOR_WHITE,
+                           "This uses the existing TWL external\n"
+                           "filter path. It does not create per-game\n"
+                           "widescreen cheats by itself.\n\n"
+                           "Press A/B/START to return.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == 1)
+            {
+                *twlExternalFilterEnabled = true;
+                changed = true;
+                drawBootHubMessage("DS Widescreen Labs",
+                                   "TWL external filter is now enabled\n"
+                                   "in pending Omiiba settings.\n\n"
+                                   "Choose Save settings and boot to write\n"
+                                   "it to config.ini.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == 2)
+            {
+                *twlExternalFilterEnabled = false;
+                changed = true;
+                drawBootHubMessage("DS Widescreen Labs",
+                                   "TWL external filter is now disabled\n"
+                                   "in pending Omiiba settings.\n\n"
+                                   "Choose Save settings and boot to write\n"
+                                   "it to config.ini.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == 3)
+            {
+                createDsWidescreenSetup();
+                drawBootHubMessage("DS Widescreen Labs",
+                                   "Created/checked DS widescreen setup:\n\n"
+                                   "SD:/omiiba/DS_WIDESCREEN_LABS.txt\n"
+                                   "SD:/omiiba/twl_filters/\n"
+                                   "SD:/roms/nds/\n\n"
+                                   "Put twl_upscaling_filter.bin in\n"
+                                   "SD:/omiiba/.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == itemAmount - 1)
+                return changed;
+            else
+            {
+                drawBootHubMessage("DS Widescreen Labs", descriptions[selectedItem]);
+                waitForBootHubBack();
+            }
+        }
+    }
+}
+
+static void writeWirelessToolsNotes(void)
+{
+    static const char notes[] =
+        "Omiiba3DS Wireless Tools\n"
+        "========================\n\n"
+        "Omiiba's arm9 boot menu cannot safely run a full Wi-Fi downloader or FTP\n"
+        "server before HOME Menu services are available. Instead, this helper prepares\n"
+        "the SD layout for the tools users normally install manually.\n\n"
+        "Recommended apps:\n\n"
+        "  Universal-Updater CIA -> SD:/cias/Universal-Updater.cia\n"
+        "  ftpd 3DSX             -> SD:/3ds/ftpd/ftpd.3dsx\n\n"
+        "Use Universal-Updater from HOME Menu to update homebrew over Wi-Fi.\n"
+        "Use ftpd from Homebrew Launcher to copy files without removing the SD card.\n";
+
+    f_mkdir("sdmc:/omiiba");
+    fileWrite(notes, "sdmc:/omiiba/WIRELESS_TOOLS.txt", sizeof(notes) - 1);
+}
+
+static void createWirelessToolsSetup(void)
+{
+    f_mkdir("sdmc:/cias");
+    f_mkdir("sdmc:/3ds");
+    f_mkdir("sdmc:/3ds/ftpd");
+    writeWirelessToolsNotes();
+}
+
+static void launchWirelessTools(void)
+{
+    static const char *items[] = {
+        "Wireless setup status",
+        "Create app folders/notes",
+        "Why not bootloader FTP?",
+        "Recommended workflow",
+        "Back to Boot Hub",
+    };
+
+    static const char *descriptions[] = {
+        "Check common Universal-Updater and ftpd\n"
+        "install paths on the SD card.",
+        "Create SD:/cias, SD:/3ds/ftpd and\n"
+        "SD:/omiiba/WIRELESS_TOOLS.txt.",
+        "Wi-Fi download/FTP belongs in HOME Menu\n"
+        "homebrew or Rosalina, not early arm9 boot.",
+        "Install Universal-Updater CIA and ftpd,\n"
+        "then update/copy files without removing SD.",
+        "Return to the Omiiba Boot Hub.",
+    };
+
+    const u32 itemAmount = sizeof(items) / sizeof(items[0]);
+    u32 selectedItem = 0;
+
+    while(true)
+    {
+        clearScreens(false);
+        drawString(true, 10, 10, COLOR_TITLE, "Wireless Tools");
+        drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "A: select    B: Boot Hub");
+        drawString(true, 10, 10 + 2 * SPACING_Y, COLOR_WHITE, "Updater and FTP setup helper");
+
+        for(u32 i = 0; i < itemAmount; i++)
+            drawString(true, 10, 10 + (4 + i) * SPACING_Y, i == selectedItem ? COLOR_RED : COLOR_WHITE, items[i]);
+
+        drawString(false, 10, 10, COLOR_WHITE, descriptions[selectedItem]);
+
+        u32 pressed;
+        do
+        {
+            pressed = waitInput(true) & (MENU_BUTTONS | BUTTON_B);
+        }
+        while(!pressed);
+
+        if(pressed & BUTTON_B)
+            return;
+
+        if(pressed & DPAD_BUTTONS)
+        {
+            switch(pressed & DPAD_BUTTONS)
+            {
+                case BUTTON_UP:
+                    selectedItem = !selectedItem ? itemAmount - 1 : selectedItem - 1;
+                    break;
+                case BUTTON_DOWN:
+                    selectedItem = selectedItem == itemAmount - 1 ? 0 : selectedItem + 1;
+                    break;
+                case BUTTON_LEFT:
+                    selectedItem = 0;
+                    break;
+                case BUTTON_RIGHT:
+                    selectedItem = itemAmount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if(pressed & BUTTON_A)
+        {
+            if(selectedItem == 0)
+            {
+                clearScreens(false);
+                drawString(true, 10, 10, COLOR_TITLE, "Wireless setup status");
+                drawString(true, 10, 10 + SPACING_Y, COLOR_TITLE, "Read-only app checks");
+
+                drawFormattedString(true, 10, 10 + 3 * SPACING_Y, COLOR_WHITE,
+                                    "CIAS folder: %s", directoryExists("sdmc:/cias") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 4 * SPACING_Y, COLOR_WHITE,
+                                    "Universal-Updater CIA: %s", getFileSize("sdmc:/cias/Universal-Updater.cia") > 0 ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 5 * SPACING_Y, COLOR_WHITE,
+                                    "3ds folder: %s", directoryExists("sdmc:/3ds") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 6 * SPACING_Y, COLOR_WHITE,
+                                    "ftpd folder: %s", directoryExists("sdmc:/3ds/ftpd") ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 7 * SPACING_Y, COLOR_WHITE,
+                                    "ftpd.3dsx: %s", getFileSize("sdmc:/3ds/ftpd/ftpd.3dsx") > 0 ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 8 * SPACING_Y, COLOR_WHITE,
+                                    "Wireless notes: %s", getFileSize("sdmc:/omiiba/WIRELESS_TOOLS.txt") > 0 ? "found" : "missing");
+
+                drawString(false, 10, 10, COLOR_WHITE,
+                           "This prepares and checks app paths.\n"
+                           "It does not download apps in arm9 boot.\n\n"
+                           "Press A/B/START to return.");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == 1)
+            {
+                createWirelessToolsSetup();
+                drawBootHubMessage("Wireless Tools",
+                                   "Created/checked wireless helper paths:\n\n"
+                                   "SD:/cias/\n"
+                                   "SD:/3ds/ftpd/\n"
+                                   "SD:/omiiba/WIRELESS_TOOLS.txt");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == itemAmount - 1)
+                return;
+            else
+            {
+                drawBootHubMessage("Wireless Tools", descriptions[selectedItem]);
+                waitForBootHubBack();
+            }
+        }
+    }
+}
+
 static void launchOpenAgbDisplayPresets(void)
 {
     const u32 presetAmount = sizeof(openAgbDisplayPresets) / sizeof(openAgbDisplayPresets[0]);
@@ -2410,7 +2728,7 @@ typedef struct
     bool visible;
 } SingleOptionState;
 
-static BootHubResult omiibaBootHub(void)
+static BootHubResult omiibaBootHub(bool *twlExternalFilterEnabled, bool *settingsDirty)
 {
     static const char *items[] = {
         "Continue normal boot",
@@ -2420,7 +2738,9 @@ static BootHubResult omiibaBootHub(void)
         "GodMode9 tools",
         "GBA Labs",
         "DS Labs",
+        "DS Widescreen Labs",
         "VC Patch Helper",
+        "Wireless Tools",
         "Diagnostics",
         "Profiles",
         "Payload manager",
@@ -2439,7 +2759,9 @@ static BootHubResult omiibaBootHub(void)
         "Launch GodMode9 from /omiiba/payloads.\n\nLow-level dumping remains delegated to GodMode9.",
         "Launch open_agb_firm and view experimental\nGBA display research notes.",
         "Check TWiLight/nds-bootstrap folders,\nDS ROM path and TWL filter setup.",
+        "Manage TWL external filter setup for\nDS widescreen and compatibility notes.",
         "Create /omiiba/titles patch folders\nand view VC LayeredFS/IPS guidance.",
+        "Prepare Universal-Updater and ftpd paths\nfor wireless updates and SD file transfer.",
         "Show safe read-only checks for Omiiba setup health.",
         "Apply named safe setting groups:\nDefault, Safe, Performance, Modding, Dev.",
         "List payloads, launch selected .firm files\nand create safe hotkey copies.",
@@ -2515,17 +2837,24 @@ static BootHubResult omiibaBootHub(void)
                     launchDsLabs();
                     break;
                 case 7:
-                    launchVcPatchHelper();
+                    if(launchDsWidescreenLabs(twlExternalFilterEnabled) && settingsDirty != NULL)
+                        *settingsDirty = true;
                     break;
                 case 8:
-                    showBootHubDiagnostics();
+                    launchVcPatchHelper();
                     break;
                 case 9:
-                    return BOOT_HUB_RUN_PROFILES;
+                    launchWirelessTools();
+                    break;
                 case 10:
-                    runPayloadManager();
+                    showBootHubDiagnostics();
                     break;
                 case 11:
+                    return BOOT_HUB_RUN_PROFILES;
+                case 12:
+                    runPayloadManager();
+                    break;
+                case 13:
                     runThemeSettings();
                     break;
                 default:
@@ -2947,7 +3276,7 @@ void configMenu(bool oldPinStatus, u32 oldPinMode)
 
 showBootHubScreen:
     {
-        BootHubResult hubResult = omiibaBootHub();
+        BootHubResult hubResult = omiibaBootHub(&singleOptions[ENABLEDSIEXTFILTER].enabled, &settingsDirty);
 
         if(hubResult == BOOT_HUB_CONTINUE_BOOT)
         {
@@ -3136,7 +3465,7 @@ showBootHubScreen:
                 }
                 else if (singleSelected == singleOptionsAmount - 3)
                 {
-                    BootHubResult hubResult = omiibaBootHub();
+                    BootHubResult hubResult = omiibaBootHub(&singleOptions[ENABLEDSIEXTFILTER].enabled, &settingsDirty);
 
                     if(hubResult == BOOT_HUB_CONTINUE_BOOT)
                     {
