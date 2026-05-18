@@ -9,6 +9,8 @@
 #define TMP_PATH "sdmc:/omiiba/update/boot.firm.tmp"
 #define BACKUP_PATH "sdmc:/omiiba/backups/boot.firm.bak"
 #define BOOT_PATH "sdmc:/boot.firm"
+#define MIN_BOOT_FIRM_SIZE (128 * 1024)
+#define MAX_BOOT_FIRM_SIZE (2 * 1024 * 1024)
 
 static bool isRedirect(u32 statusCode)
 {
@@ -131,6 +133,27 @@ static Result downloadToFile(const char *url, const char *path)
     return ret;
 }
 
+static Result validateDownloadedFirm(const char *path)
+{
+    FILE *file = fopen(path, "rb");
+    if(file == NULL)
+        return -7;
+
+    if(fseek(file, 0, SEEK_END) != 0)
+    {
+        fclose(file);
+        return -8;
+    }
+
+    long size = ftell(file);
+    fclose(file);
+
+    if(size < MIN_BOOT_FIRM_SIZE || size > MAX_BOOT_FIRM_SIZE)
+        return -9;
+
+    return 0;
+}
+
 static Result installBootFirm(void)
 {
     mkdir("sdmc:/omiiba", 0777);
@@ -143,11 +166,23 @@ static Result installBootFirm(void)
     if(R_FAILED(ret))
         return ret;
 
+    ret = validateDownloadedFirm(TMP_PATH);
+    if(R_FAILED(ret))
+    {
+        remove(TMP_PATH);
+        return ret;
+    }
+
     remove(BACKUP_PATH);
-    rename(BOOT_PATH, BACKUP_PATH);
+    bool hadBootFirm = rename(BOOT_PATH, BACKUP_PATH) == 0;
 
     if(rename(TMP_PATH, BOOT_PATH) != 0)
+    {
+        if(hadBootFirm)
+            rename(BACKUP_PATH, BOOT_PATH);
+        remove(TMP_PATH);
         return -6;
+    }
 
     return 0;
 }
@@ -189,8 +224,8 @@ int main(void)
             else
             {
                 printf("\nUpdate failed: 0x%08" PRIX32 "\n", (u32)installRet);
-                printf("Your previous boot.firm should still be available\n");
-                printf("unless the failure happened during final rename.\n");
+                printf("The updater attempted to preserve or restore\n");
+                printf("your previous SD:/boot.firm on failure.\n");
             }
             printf("\nSTART: exit\n");
         }

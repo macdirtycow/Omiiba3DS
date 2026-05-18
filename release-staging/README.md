@@ -81,7 +81,7 @@ Everything in the *Description* section above was already present in upstream Lu
 * The on-card data folder moved from `/luma` to `/omiiba`, with an automatic one-shot migration on first boot
 * A custom textual coldboot splash screen (existing `splash.bin` / `splashbottom.bin` files keep working)
 * Rosalina overlay menu retitled "Cow menu" with a burnt-orange / amber-brown title color (`#CC6600`)
-* Hardcoded version `v1.4.8` (no longer derived from upstream Luma git tags)
+* Hardcoded version `v1.4.9` (no longer derived from upstream Luma git tags)
 * Optional one-line tagline from `/omiiba/boot_message.txt` shown on the boot splash
 * Rotating "Cow tip" on the bottom splash (state in `/omiiba/.cow_tip_state`)
 * **Cold-boot splash:** dark panels and accent bars, 2× scaled `OMIIBA3DS` logo, readable muted text, rotating tips kept inside the bottom card (wrapped when needed)
