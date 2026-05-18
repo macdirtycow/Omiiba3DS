@@ -8,10 +8,18 @@ layout for the tools users normally install manually.
 Recommended apps:
 
   Universal-Updater CIA -> SD:/cias/Universal-Updater.cia
+  Omiiba UniStore       -> SD:/3ds/Universal-Updater/stores/omiiba.unistore
   ftpd 3DSX             -> SD:/3ds/ftpd/ftpd.3dsx
 
-Use Universal-Updater from HOME Menu to update homebrew over Wi-Fi.
+Use Universal-Updater from HOME Menu to update Omiiba over Wi-Fi.
 Use ftpd from Homebrew Launcher to copy files without removing the SD card.
+
+OTA update workflow:
+
+1. Open Universal-Updater.
+2. Switch to the Omiiba3DS store.
+3. Choose "Install latest Omiiba3DS boot.firm".
+4. Reboot after install.
 
 Boot path:
 

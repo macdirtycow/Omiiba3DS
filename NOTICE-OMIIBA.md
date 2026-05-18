@@ -20,7 +20,7 @@ This fork is **not** affiliated with, endorsed by, or supported by LumaTeam.
 
 ## Summary of changes vs. upstream Luma3DS
 
-Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** and **2026-05-17** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, v1.3.4 splash readability, v1.4.0 Omiiba Boot Hub, v1.4.1 fast Boot Hub exit, v1.4.2 Hub-first polish, v1.4.3 GBA Labs, v1.4.4 GBA display presets and DS Labs, v1.4.5 VC Patch Helper and GBA VC research, **v1.4.6** DS Widescreen Labs and Wireless Tools).
+Date of changes: **2026-05-10 / 2026-05-11**, updated **2026-05-13** and **2026-05-17** (v1.3.1 colours, v1.3.2 splash extras, v1.3.3 no pre-firm LCD power-down, v1.3.4 splash readability, v1.4.0 Omiiba Boot Hub, v1.4.1 fast Boot Hub exit, v1.4.2 Hub-first polish, v1.4.3 GBA Labs, v1.4.4 GBA display presets and DS Labs, v1.4.5 VC Patch Helper and GBA VC research, v1.4.6 DS Widescreen Labs and Wireless Tools, **v1.4.7** Universal-Updater OTA store).
 
 The following modifications were made to the upstream Luma3DS source tree.
 Almost every source file received the rebrand replacements; only the most
@@ -151,10 +151,12 @@ significant functional changes are listed individually.
   `SD:/omiiba/titles/0004000000000000/romfs/` as a safe template, writes
   `SD:/omiiba/VC_PATCH_HELP.txt`, and documents `code.ips`, `code.bps`,
   `code.bin`, `exheader.bin`, `locale.txt`, and LayeredFS `romfs/` layouts.
-- **Wireless Tools** (`arm9/source/config.c`): the Boot Hub now includes a safe
-  setup helper for `Universal-Updater.cia` and `ftpd.3dsx` paths. It creates
-  `SD:/cias/`, `SD:/3ds/ftpd/` and `SD:/omiiba/WIRELESS_TOOLS.txt`; it does not
-  run bootloader networking or install CIA files directly.
+- **Wireless Tools / OTA** (`arm9/source/config.c`, `release-staging/3ds/Universal-Updater/stores/`):
+  the Boot Hub now includes a safe setup helper for `Universal-Updater.cia`,
+  Omiiba's bundled `omiiba.unistore`, and `ftpd.3dsx` paths. It creates
+  `SD:/cias/`, `SD:/3ds/Universal-Updater/stores/`, `SD:/3ds/ftpd/` and
+  `SD:/omiiba/WIRELESS_TOOLS.txt`; it does not run bootloader networking or
+  install CIA files directly.
 - `arm9/source/main.c`: **No LCD power-down before `launchFirm()`.** Upstream
   Luma called `deinitScreens()` here, which blanks the panel until the OS
   redraws; Omiiba3DS omits that so the last splash frame stays visible
@@ -162,7 +164,7 @@ significant functional changes are listed individually.
 
 ### Versioning
 - `arm9/Makefile` no longer derives the version from upstream Luma git
-  tags. Hardcoded default is `1.4.6`, override with
+  tags. Hardcoded default is `1.4.7`, override with
   `make VERSION_MAJOR=… VERSION_MINOR=… VERSION_BUILD=…`.
 
 ### Buffer fixes related to the longer `/omiiba` prefix

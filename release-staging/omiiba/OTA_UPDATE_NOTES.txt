@@ -1,0 +1,26 @@
+Omiiba3DS OTA Update Notes
+==========================
+
+Phase 1 uses Universal-Updater instead of putting networking inside the arm9
+bootloader.
+
+Bundled store file:
+
+  SD:/3ds/Universal-Updater/stores/omiiba.unistore
+
+Workflow:
+
+1. Install Universal-Updater if needed.
+2. Open Universal-Updater from HOME Menu.
+3. Switch to the Omiiba3DS store.
+4. Choose "Install latest Omiiba3DS boot.firm".
+5. Reboot after the install completes.
+
+The UniStore downloads the GitHub release zip and extracts boot.firm to:
+
+  SD:/boot.firm
+
+Alpha warning:
+
+Keep a known-good boot.firm backup on your PC or SD card before using OTA
+firmware updates.

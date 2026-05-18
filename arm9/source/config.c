@@ -1544,8 +1544,9 @@ static void writeWirelessToolsNotes(void)
         "the SD layout for the tools users normally install manually.\n\n"
         "Recommended apps:\n\n"
         "  Universal-Updater CIA -> SD:/cias/Universal-Updater.cia\n"
+        "  Omiiba UniStore       -> SD:/3ds/Universal-Updater/stores/omiiba.unistore\n"
         "  ftpd 3DSX             -> SD:/3ds/ftpd/ftpd.3dsx\n\n"
-        "Use Universal-Updater from HOME Menu to update homebrew over Wi-Fi.\n"
+        "Use Universal-Updater from HOME Menu to update Omiiba over Wi-Fi.\n"
         "Use ftpd from Homebrew Launcher to copy files without removing the SD card.\n";
 
     f_mkdir("sdmc:/omiiba");
@@ -1556,6 +1557,8 @@ static void createWirelessToolsSetup(void)
 {
     f_mkdir("sdmc:/cias");
     f_mkdir("sdmc:/3ds");
+    f_mkdir("sdmc:/3ds/Universal-Updater");
+    f_mkdir("sdmc:/3ds/Universal-Updater/stores");
     f_mkdir("sdmc:/3ds/ftpd");
     writeWirelessToolsNotes();
 }
@@ -1565,6 +1568,7 @@ static void launchWirelessTools(void)
     static const char *items[] = {
         "Wireless setup status",
         "Create app folders/notes",
+        "Omiiba OTA store help",
         "Why not bootloader FTP?",
         "Recommended workflow",
         "Back to Boot Hub",
@@ -1574,10 +1578,15 @@ static void launchWirelessTools(void)
         "Check common Universal-Updater and ftpd\n"
         "install paths on the SD card.",
         "Create SD:/cias, SD:/3ds/ftpd and\n"
-        "SD:/omiiba/WIRELESS_TOOLS.txt.",
+        "Universal-Updater store folders.",
+        "Use the bundled omiiba.unistore with\n"
+        "Universal-Updater to install latest\n"
+        "GitHub release boot.firm over Wi-Fi.",
         "Wi-Fi download/FTP belongs in HOME Menu\n"
         "homebrew or Rosalina, not early arm9 boot.",
-        "Install Universal-Updater CIA and ftpd,\n"
+        "Install Universal-Updater CIA, open the\n"
+        "Omiiba store, then install latest boot.firm.\n"
+        "Use ftpd for wireless file transfer.",
         "then update/copy files without removing SD.",
         "Return to the Omiiba Boot Hub.",
     };
@@ -1640,12 +1649,14 @@ static void launchWirelessTools(void)
                 drawFormattedString(true, 10, 10 + 4 * SPACING_Y, COLOR_WHITE,
                                     "Universal-Updater CIA: %s", getFileSize("sdmc:/cias/Universal-Updater.cia") > 0 ? "found" : "missing");
                 drawFormattedString(true, 10, 10 + 5 * SPACING_Y, COLOR_WHITE,
-                                    "3ds folder: %s", directoryExists("sdmc:/3ds") ? "found" : "missing");
+                                    "Omiiba UniStore: %s", getFileSize("sdmc:/3ds/Universal-Updater/stores/omiiba.unistore") > 0 ? "found" : "missing");
                 drawFormattedString(true, 10, 10 + 6 * SPACING_Y, COLOR_WHITE,
-                                    "ftpd folder: %s", directoryExists("sdmc:/3ds/ftpd") ? "found" : "missing");
+                                    "3ds folder: %s", directoryExists("sdmc:/3ds") ? "found" : "missing");
                 drawFormattedString(true, 10, 10 + 7 * SPACING_Y, COLOR_WHITE,
-                                    "ftpd.3dsx: %s", getFileSize("sdmc:/3ds/ftpd/ftpd.3dsx") > 0 ? "found" : "missing");
+                                    "ftpd folder: %s", directoryExists("sdmc:/3ds/ftpd") ? "found" : "missing");
                 drawFormattedString(true, 10, 10 + 8 * SPACING_Y, COLOR_WHITE,
+                                    "ftpd.3dsx: %s", getFileSize("sdmc:/3ds/ftpd/ftpd.3dsx") > 0 ? "found" : "missing");
+                drawFormattedString(true, 10, 10 + 9 * SPACING_Y, COLOR_WHITE,
                                     "Wireless notes: %s", getFileSize("sdmc:/omiiba/WIRELESS_TOOLS.txt") > 0 ? "found" : "missing");
 
                 drawString(false, 10, 10, COLOR_WHITE,
@@ -1660,8 +1671,19 @@ static void launchWirelessTools(void)
                 drawBootHubMessage("Wireless Tools",
                                    "Created/checked wireless helper paths:\n\n"
                                    "SD:/cias/\n"
+                                   "SD:/3ds/Universal-Updater/stores/\n"
                                    "SD:/3ds/ftpd/\n"
                                    "SD:/omiiba/WIRELESS_TOOLS.txt");
+                waitForBootHubBack();
+            }
+            else if(selectedItem == 2)
+            {
+                drawBootHubMessage("Omiiba OTA store",
+                                   "The release zip includes:\n\n"
+                                   "SD:/3ds/Universal-Updater/stores/omiiba.unistore\n\n"
+                                   "Open Universal-Updater, switch to the\n"
+                                   "Omiiba store, then install latest\n"
+                                   "Omiiba3DS boot.firm.");
                 waitForBootHubBack();
             }
             else if(selectedItem == itemAmount - 1)

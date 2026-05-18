@@ -1,0 +1,53 @@
+{
+    "storeInfo": {
+        "title": "Omiiba3DS",
+        "author": "Omiiba3DS",
+        "description": "OTA updates for Omiiba3DS boot.firm from GitHub releases",
+        "url": "https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/omiiba.unistore",
+        "file": "omiiba.unistore",
+        "revision": 147,
+        "version": 4
+    },
+    "storeContent": [
+        {
+            "info": {
+                "title": "Omiiba3DS boot.firm",
+                "author": "macdirtycow / Omiiba3DS contributors",
+                "description": "Download the latest Omiiba3DS GitHub release zip and extract boot.firm to SD root. Keep a known-good backup before updating alpha firmware.",
+                "category": ["firmware", "utility"],
+                "console": ["3DS"],
+                "last_updated": "2026-05-18 at 14:00 (UTC)",
+                "license": "gpl-3.0",
+                "version": "v1.4.7"
+            },
+            "Install latest Omiiba3DS boot.firm": [
+                {
+                    "type": "downloadFile",
+                    "file": "https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.7.zip",
+                    "message": "Downloading latest Omiiba3DS release zip...",
+                    "output": "sdmc:/omiiba/update/Omiiba3DS-latest.zip"
+                },
+                {
+                    "type": "extractFile",
+                    "file": "sdmc:/omiiba/update/Omiiba3DS-latest.zip",
+                    "input": "boot.firm",
+                    "message": "Installing boot.firm to SD root...",
+                    "output": "sdmc:/boot.firm"
+                },
+                {
+                    "type": "deleteFile",
+                    "file": "sdmc:/omiiba/update/Omiiba3DS-latest.zip",
+                    "message": "Cleaning temporary update zip..."
+                }
+            ],
+            "Download full release zip only": [
+                {
+                    "type": "downloadFile",
+                    "file": "https://github.com/macdirtycow/Omiiba3DS/releases/latest/download/Omiiba3DS-v1.4.7.zip",
+                    "message": "Downloading full Omiiba3DS release zip...",
+                    "output": "sdmc:/omiiba/update/Omiiba3DS-v1.4.7.zip"
+                }
+            ]
+        }
+    ]
+}

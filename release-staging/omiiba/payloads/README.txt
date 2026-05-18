@@ -63,7 +63,11 @@ Omiiba Boot Hub -> Wireless Tools
 
 Recommended app paths:
 SD:/cias/Universal-Updater.cia
+SD:/3ds/Universal-Updater/stores/omiiba.unistore
 SD:/3ds/ftpd/ftpd.3dsx
+
+For Omiiba OTA updates:
+Open Universal-Updater -> Omiiba3DS store -> Install latest Omiiba3DS boot.firm
 
 For system save dumps, use the release zip's script:
 SD:/gm9/scripts/Omiiba_System_Save_Dump.gm9
